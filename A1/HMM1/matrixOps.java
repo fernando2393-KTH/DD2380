@@ -1,9 +1,21 @@
 // Class to enclose all matrix operations
+import java.io.BufferedReader; 
+import java.io.IOException; 
+import java.io.InputStreamReader;
 
 public class matrixOps {
     //IO
-    // Given a console line, returns the encoded matrix
-    public static double[][] parse_matrix(String encoded_matrix) {
+    // Read matrix from console
+    public static double[][] read_matrix() {
+        BufferedReader reader =  new BufferedReader(new InputStreamReader(System.in));
+        String encoded_matrix;
+        try {
+            encoded_matrix = reader.readLine());
+        } catch (Exception e) {
+            System.err.println("Could not read from System.in");
+            return null;
+        }
+        
         String[] splitted = encoded_matrix.split(" ");
         int rows = Integer.parseInt(splitted[0]);
         int cols = Integer.parseInt(splitted[1]);
@@ -12,6 +24,24 @@ public class matrixOps {
             for(int j = 0; j < cols; j++)
                 matrix[i][j] = Double.parseDouble(splitted[i * cols + j + 2]); // Two is added since 2 first values were rows and cols
         return matrix;
+    }
+
+    public static double[] read_vector() {
+        BufferedReader reader =  new BufferedReader(new InputStreamReader(System.in));
+        String encoded_matrix;
+        try {
+            encoded_matrix = reader.readLine());
+        } catch (Exception e) {
+            System.err.println("Could not read from System.in");
+            return null;
+        }
+        
+        String[] splitted = encoded_matrix.split(" ");
+        int length = Integer.parseInt(splitted[0]);
+        double[] vector = new double[length]
+        for (int i = 0; i < length; i++)
+            vector[i] = Double.parseDouble(splitted[i + 1]);
+        return vector;
     }
     
     // Given a console line, returns the encoded matrix
