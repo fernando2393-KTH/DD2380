@@ -4,6 +4,5 @@ public class main {
         hmm.read_hmm();
         // hmm.print_hmm();
         hmm.next_emission();
-        // Test
     } 
 } 
