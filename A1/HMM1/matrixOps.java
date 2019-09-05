@@ -6,16 +6,14 @@ import java.io.InputStreamReader;
 public class matrixOps {
     //IO
     // Read matrix from console
-    public static double[][] read_matrix() {
-        BufferedReader reader =  new BufferedReader(new InputStreamReader(System.in));
+    public static double[][] read_matrix(BufferedReader reader) {
         String encoded_matrix;
         try {
-            encoded_matrix = reader.readLine());
+            encoded_matrix = reader.readLine();
         } catch (Exception e) {
             System.err.println("Could not read from System.in");
             return null;
         }
-        
         String[] splitted = encoded_matrix.split(" ");
         int rows = Integer.parseInt(splitted[0]);
         int cols = Integer.parseInt(splitted[1]);
@@ -26,11 +24,10 @@ public class matrixOps {
         return matrix;
     }
 
-    public static double[] read_vector() {
-        BufferedReader reader =  new BufferedReader(new InputStreamReader(System.in));
+    public static int[] read_int_vect(BufferedReader reader) { // TODO(Fernando); Use generics instead of int
         String encoded_matrix;
         try {
-            encoded_matrix = reader.readLine());
+            encoded_matrix = reader.readLine();
         } catch (Exception e) {
             System.err.println("Could not read from System.in");
             return null;
@@ -38,9 +35,9 @@ public class matrixOps {
         
         String[] splitted = encoded_matrix.split(" ");
         int length = Integer.parseInt(splitted[0]);
-        double[] vector = new double[length]
+        int[] vector = new int[length];
         for (int i = 0; i < length; i++)
-            vector[i] = Double.parseDouble(splitted[i + 1]);
+            vector[i] = Integer.parseInt(splitted[i + 1]);
         return vector;
     }
     
@@ -75,6 +72,36 @@ public class matrixOps {
                 for (int k = 0; k < cols_a; k++) sum += mat_a[i][k]*mat_b[k][j];
                 result[i][j] = sum;
             }
+        return result;
+    }
+
+    // multiplies given matrices element-wise (UNUSED)
+    public static double[][] elem_wise_mult(double[][] mat_a, double[][] mat_b) {
+        int rows_a = mat_a.length;
+        int cols_a = mat_a[0].length;
+        int rows_b = mat_b.length;
+        int cols_b = mat_b[0].length;
+        if (cols_a != cols_b || rows_a != rows_b)
+            return null;
+        double[][] result = new double[rows_a][cols_a];
+        for (int i = 0; i < rows_a; i++)
+            for (int j = 0; j < cols_b; j++)
+                result[i][j] = mat_a[i][j]*mat_b[i][j];
+        return result;
+    }
+
+    // given a vector, a matrix and  a col_id, returns vector of element-wise
+    // multiplication of vector values and given column (useful at forward alg)
+    public static double[][] vector_col_elem_wise_mult(double[][] vect, double[][] mat, int col) {
+        int rows_mat = mat.length;
+        int cols_mat = mat[0].length;
+        int rows_vect = vect.length;
+        int cols_vect = vect[0].length;
+        if (cols_vect != rows_mat)
+            return null;
+        double[][] result = new double[1][cols_vect];
+        for (int i = 0; i < cols_vect; i++)
+            result[0][i] = vect[0][i]*mat[i][col];
         return result;
     }
 }
