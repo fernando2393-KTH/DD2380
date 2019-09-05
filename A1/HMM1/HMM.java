@@ -1,6 +1,9 @@
+
 // Class to hold HMM
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
-import matrixOps;
 
 public class HMM {
     static double[][] A;
@@ -9,9 +12,18 @@ public class HMM {
 
     // Reads values from console and populates A, B, pi
     public static void read_hmm() {
-        A = matrixOps.read_matrix();
-        B = matrixOps.read_matrix();
-        pi = matrixOps.read_matrix();   
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        A = matrixOps.read_matrix(reader);
+        B = matrixOps.read_matrix(reader);
+        pi = matrixOps.read_matrix(reader);
+
+        try {
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // Reads values from console and populates A, B, pi

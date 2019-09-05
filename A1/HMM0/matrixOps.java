@@ -1,28 +1,28 @@
 // Class to enclose all matrix operations
-import java.io.BufferedReader; 
-import java.io.IOException; 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class matrixOps {
-    //IO
+    // IO
     // Read matrix from console
-    public static double[][] read_matrix() {
-        BufferedReader reader =  new BufferedReader(new InputStreamReader(System.in));
+    public static double[][] read_matrix(BufferedReader reader) {
+        
         String encoded_matrix;
         try {
-            encoded_matrix = reader.readLine());
+            encoded_matrix = reader.readLine();
         } catch (Exception e) {
             System.err.println("Could not read from System.in");
             return null;
         }
-        
+
         String[] splitted = encoded_matrix.split(" ");
         int rows = Integer.parseInt(splitted[0]);
         int cols = Integer.parseInt(splitted[1]);
         double[][] matrix = new double[rows][cols];
-        for(int i = 0; i < rows; i++)
-            for(int j = 0; j < cols; j++)
-                matrix[i][j] = Double.parseDouble(splitted[i * cols + j + 2]); // Two is added since 2 first values were rows and cols
+        for (int i = 0; i < rows; i++)
+            for (int j = 0; j < cols; j++)
+                matrix[i][j] = Double.parseDouble(splitted[i * cols + j + 2]);
         return matrix;
     }
 
@@ -30,7 +30,7 @@ public class matrixOps {
         BufferedReader reader =  new BufferedReader(new InputStreamReader(System.in));
         String encoded_matrix;
         try {
-            encoded_matrix = reader.readLine());
+            encoded_matrix = reader.readLine();
         } catch (Exception e) {
             System.err.println("Could not read from System.in");
             return null;
@@ -38,7 +38,7 @@ public class matrixOps {
         
         String[] splitted = encoded_matrix.split(" ");
         int length = Integer.parseInt(splitted[0]);
-        double[] vector = new double[length]
+        double[] vector = new double[length];
         for (int i = 0; i < length; i++)
             vector[i] = Double.parseDouble(splitted[i + 1]);
         return vector;
