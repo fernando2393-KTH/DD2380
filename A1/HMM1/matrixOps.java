@@ -1,11 +1,11 @@
 // Class to enclose all matrix operations
 import java.io.BufferedReader;
+import java.lang.Math;
 
 public class matrixOps {
     // IO
     // Read matrix from console
-    public static double[][] read_matrix(BufferedReader reader) {
-        
+    public static double[][] read_matrix(BufferedReader reader) {        
         String encoded_matrix;
         try {
             encoded_matrix = reader.readLine();
@@ -13,7 +13,6 @@ public class matrixOps {
             System.err.println("Could not read from System.in");
             return null;
         }
-
         String[] splitted = encoded_matrix.split(" ");
         int rows = Integer.parseInt(splitted[0]);
         int cols = Integer.parseInt(splitted[1]);
@@ -25,7 +24,6 @@ public class matrixOps {
     }
 
     public static int[] read_vector(BufferedReader reader) {
-
         String encoded_matrix;
         try {
             encoded_matrix = reader.readLine();
@@ -76,42 +74,40 @@ public class matrixOps {
         return result;
     }
 
-    // Forward-Algorithm
-    public static double fwdAlgorithm(double [][] A, double [][] B, double [][] Pi, int [] Obs){
-
-        double [][] alpha = new double [A[0].length][A.length]; // Result matrix
-
-        alpha = elementWise(Pi, B, Obs[0]);
-
-        for(int i = 1; i < Obs.length; i++){
-
-            alpha = elementWise(multiply(alpha, A), B, Obs[i]);
-
-        }
-
-        double result = 0;
-
-        for(int i = 0; i < alpha[0].length; i++){
-
-            result += alpha[0][i];
-
-        }
-
+    // multiplies given matrices element-wise (UNUSED)
+    public static double[][] elem_wise_mult(double[][] mat_a, double[][] mat_b) {
+        int rows_a = mat_a.length;
+        int cols_a = mat_a[0].length;
+        int rows_b = mat_b.length;
+        int cols_b = mat_b[0].length;
+        if (cols_a != cols_b || rows_a != rows_b)
+            return null;
+        double[][] result = new double[rows_a][cols_a];
+        for (int i = 0; i < rows_a; i++)
+            for (int j = 0; j < cols_b; j++)
+                result[i][j] = mat_a[i][j]*mat_b[i][j];
         return result;
     }
 
-    public static double [][] elementWise(double [][] A, double [][] B, int col){
-
-        if (A[0].length != B.length){ // Check multiplication is possible
+    // given a vector, a matrix and  a col_id, returns vector of element-wise
+    // multiplication of vector values and given column (useful at forward alg)
+    public static double[][] vector_col_elem_wise_mult(double[][] vect, double[][] mat, int col) {
+        int rows_mat = mat.length;
+        int cols_mat = mat[0].length;
+        int rows_vect = vect.length;
+        int cols_vect = vect[0].length;
+        if (cols_vect != rows_mat)
             return null;
-        }
-
-        double [][] result = new double [1][A[0].length]; // Result matrix
-
-        for (int i = 0; i < result[0].length; i++){
-
-                result[0][i] = A[0][i] * B[i][col];
-        }
+        double[][] result = new double[1][cols_vect];
+        for (int i = 0; i < cols_vect; i++)
+            result[0][i] = vect[0][i]*mat[i][col];
         return result;
+    }
+
+    // BASIC ARITHMETIC
+    // Returns the ssave multiplication of two doubles
+    private static double safe_mult(double a, double b) {
+        double log_sum = Math.log(a) + Math.log(b);
+        return Math.exp(log_sum);
     }
 }

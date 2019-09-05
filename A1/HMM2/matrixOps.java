@@ -1,11 +1,13 @@
 // Class to enclose all matrix operations
-import java.io.BufferedReader;
+import java.io.BufferedReader; 
+import java.io.IOException; 
+import java.io.InputStreamReader;
+import java.lang.Math;
 
 public class matrixOps {
-    // IO
+    //IO
     // Read matrix from console
     public static double[][] read_matrix(BufferedReader reader) {
-        
         String encoded_matrix;
         try {
             encoded_matrix = reader.readLine();
@@ -13,15 +15,31 @@ public class matrixOps {
             System.err.println("Could not read from System.in");
             return null;
         }
-
         String[] splitted = encoded_matrix.split(" ");
         int rows = Integer.parseInt(splitted[0]);
         int cols = Integer.parseInt(splitted[1]);
         double[][] matrix = new double[rows][cols];
-        for (int i = 0; i < rows; i++)
-            for (int j = 0; j < cols; j++)
-                matrix[i][j] = Double.parseDouble(splitted[i * cols + j + 2]);
+        for(int i = 0; i < rows; i++)
+            for(int j = 0; j < cols; j++)
+                matrix[i][j] = Double.parseDouble(splitted[i * cols + j + 2]); // Two is added since 2 first values were rows and cols
         return matrix;
+    }
+
+    public static int[] read_int_vect(BufferedReader reader) { // TODO(Fernando); Use generics instead of int
+        String encoded_matrix;
+        try {
+            encoded_matrix = reader.readLine();
+        } catch (Exception e) {
+            System.err.println("Could not read from System.in");
+            return null;
+        }
+        
+        String[] splitted = encoded_matrix.split(" ");
+        int length = Integer.parseInt(splitted[0]);
+        int[] vector = new int[length];
+        for (int i = 0; i < length; i++)
+            vector[i] = Integer.parseInt(splitted[i + 1]);
+        return vector;
     }
     
     // Given a console line, returns the encoded matrix
@@ -86,5 +104,12 @@ public class matrixOps {
         for (int i = 0; i < cols_vect; i++)
             result[0][i] = vect[0][i]*mat[i][col];
         return result;
+    }
+
+    // BASIC ARITHMETIC
+    // Returns the ssave multiplication of two doubles
+    private static double safe_mult(double a, double b) {
+        double log_sum = Math.log(a) + Math.log(b);
+        return Math.exp(log_sum);
     }
 }
