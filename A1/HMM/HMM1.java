@@ -16,7 +16,7 @@ public class HMM1 {
             System.err.println(e);
         }
         
-        System.out.println(HMM.fwd_result(obs));
+        System.out.println(HMM.fwdAlgorithm(obs));
 
     } 
 } 

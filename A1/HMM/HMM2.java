@@ -17,11 +17,13 @@ public class HMM2 {
             System.err.println(e);
         }
 
-        int[] sequence = hmm.most_likely_sequence(obs);
+        int[] sequence = HMM.viterbiAlgorithm(obs);
 
         System.out.print(sequence[0]);
-        for (int i = 1; i < sequence.length; i++) 
+        for (int i = 1; i < sequence.length; i++){
             System.out.print(" ");
             System.out.print(sequence[i]);
+        }
+        System.out.println();
     }
 }

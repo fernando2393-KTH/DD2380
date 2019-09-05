@@ -3,6 +3,8 @@ import java.io.BufferedReader;
 import java.io.IOException; 
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.List;
+import javafx.util.Pair;
 
 public class HMM {
     // PUBLIC
@@ -36,7 +38,7 @@ public class HMM {
 
     // Uses forward algorithm to compute probability of
     // a given sequence of observations
-    public static double fwd_result(int[] observations) {
+    public static double fwdAlgorithm(int[] observations) {
         double[][] alpha = 
             matrixOps.vector_col_elem_wise_mult(pi, B, observations[0]);
 
@@ -53,12 +55,47 @@ public class HMM {
 
     // Uses viterbi algorithm to compute the most likely sequence
     // given a set of observations
-    public int[] most_likely_sequence(int[] observations) {
+    public static int[] viterbiAlgorithm(int[] observations) {
+
         int[] result = new int[observations.length];
-        double[][] delta =
+
+        int [][] path = new int [pi[0].length][observations.length]; // Array of possible combinations per time
+
+        double [][] deltaPrev =
             matrixOps.vector_col_elem_wise_mult(pi, B, observations[0]);
         
-        // for (int i = 1; i < observations.)
+        for (int i = 1; i < observations.length; i++){ // Per observation
+
+            double [][] delta = new double [1][pi[0].length];
+
+            for(int j = 0; j < pi[0].length; j++){ // Per state
+
+                Pair<Double, Integer> max_pair = matrixOps.maxVectorMatrixCol(deltaPrev, A, j);
+                path[j][i] = max_pair.getValue();
+
+                delta[0][j] = max_pair.getKey() * B[j][observations[i]];
+
+            }
+
+            deltaPrev = delta; // Update delta
+        }
+
+        double maximum = -1;
+        int maximum_position = -1;
+
+        for(int i = 0; i < deltaPrev[0].length; i++){
+            
+            if(deltaPrev[0][i] > maximum){
+                maximum = deltaPrev[0][i];
+                maximum_position = i;
+            }
+        }
+
+        result[observations.length - 1] = maximum_position;
+
+        for(int i = observations.length - 2; i > -1; i--){
+            result[i] = path[result[i+1]][i+1];
+        }
 
         return result;
     }

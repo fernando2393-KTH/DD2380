@@ -1,6 +1,9 @@
 // Class to enclose all matrix operations
+import java.awt.List;
 import java.io.BufferedReader;
 import java.lang.Math;
+import java.util.ArrayList;
+import javafx.util.Pair;
 
 public class matrixOps {
     // IO
@@ -77,8 +80,8 @@ public class matrixOps {
     // given a vector, a matrix and  a col_id, returns vector of element-wise
     // multiplication of vector values and given column (useful at forward alg)
     public static double[][] vector_col_elem_wise_mult(double[][] vect, double[][] mat, int col) {
-        int rows_mat = mat.length;
 
+        int rows_mat = mat.length;
         int cols_vect = vect[0].length;
         if (cols_vect != rows_mat)
             return null;
@@ -86,6 +89,36 @@ public class matrixOps {
         for (int i = 0; i < cols_vect; i++)
             result[0][i] = vect[0][i]*mat[i][col];
         return result;
+    }
+
+    public static Pair<Double, Integer> maxVectorMatrixCol(double [][] vector, double [][] matrix, int col){
+
+        int rows_mat = matrix.length;
+        int cols_vect = vector[0].length;
+        if (cols_vect != rows_mat)
+            return null;
+
+        double maximum = -1;
+
+        int max_position = -1;
+        
+        for(int i = 0;  i < vector[0].length; i++){
+
+            double value = vector[0][i] * matrix[i][col];
+
+            if(value > maximum){
+                maximum = value;
+                max_position = i;
+                //max_positions.clear();
+                //max_positions.add(i);
+            }
+            // else if(value == maximum) {
+            //     max_positions.add(i);
+            // }
+        }
+
+        return new Pair<Double, Integer>(maximum, max_position);
+
     }
 
     // BASIC ARITHMETIC
