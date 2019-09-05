@@ -9,6 +9,7 @@ public class HMM {
     static double[][] A;
     static double[][] B;
     static double[][] Pi;
+    static int[] Obs;
 
     // Reads values from console and populates A, B, Pi
     public static void read_hmm() {
@@ -18,7 +19,7 @@ public class HMM {
         A = matrixOps.read_matrix(reader);
         B = matrixOps.read_matrix(reader);
         Pi = matrixOps.read_matrix(reader);
-
+        Obs = matrixOps.read_vector(reader);
 
         try {
             reader.close();
@@ -42,6 +43,14 @@ public class HMM {
         double[][] state_prob = matrixOps.multiply(Pi, A);
         double[][] emission_prob = matrixOps.multiply(state_prob, B);
         matrixOps.print_matrix(emission_prob);
+    }
+
+    //FwdResult
+
+    public static void fwdResult(){
+
+        System.out.println(matrixOps.fwdAlgorithm(A, B, Pi, Obs));
+
     }
 
     // PRIVATE

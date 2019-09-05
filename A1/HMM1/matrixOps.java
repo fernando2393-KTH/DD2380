@@ -24,7 +24,7 @@ public class matrixOps {
         return matrix;
     }
 
-    public static double[] read_vector(BufferedReader reader) {
+    public static int[] read_vector(BufferedReader reader) {
 
         String encoded_matrix;
         try {
@@ -36,9 +36,9 @@ public class matrixOps {
         
         String[] splitted = encoded_matrix.split(" ");
         int length = Integer.parseInt(splitted[0]);
-        double[] vector = new double[length];
+        int[] vector = new int[length];
         for (int i = 0; i < length; i++)
-            vector[i] = Double.parseDouble(splitted[i + 1]);
+            vector[i] = Integer.parseInt(splitted[i + 1]);
         return vector;
     }
     
@@ -73,6 +73,45 @@ public class matrixOps {
                 for (int k = 0; k < cols_a; k++) sum += mat_a[i][k]*mat_b[k][j];
                 result[i][j] = sum;
             }
+        return result;
+    }
+
+    // Forward-Algorithm
+    public static double fwdAlgorithm(double [][] A, double [][] B, double [][] Pi, int [] Obs){
+
+        double [][] alpha = new double [A[0].length][A.length]; // Result matrix
+
+        alpha = elementWise(Pi, B, Obs[0]);
+
+        for(int i = 1; i < Obs.length; i++){
+
+            alpha = elementWise(multiply(alpha, A), B, Obs[i]);
+
+        }
+
+        double result = 0;
+
+        for(int i = 0; i < alpha[0].length; i++){
+
+            result += alpha[0][i];
+
+        }
+
+        return result;
+    }
+
+    public static double [][] elementWise(double [][] A, double [][] B, int col){
+
+        if (A[0].length != B.length){ // Check multiplication is possible
+            return null;
+        }
+
+        double [][] result = new double [1][A[0].length]; // Result matrix
+
+        for (int i = 0; i < result[0].length; i++){
+
+                result[0][i] = A[0][i] * B[i][col];
+        }
         return result;
     }
 }

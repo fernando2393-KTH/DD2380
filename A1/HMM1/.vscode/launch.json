@@ -1,0 +1,12 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - HMM1",
+            "request": "launch",
+            "mainClass": "HMM1",
+            "projectName": "HMM1_f32865cd",
+            "args": "< test.in"
+        }
+    ]
+}
