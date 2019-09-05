@@ -2,11 +2,11 @@
     "configurations": [
         {
             "type": "java",
-            "name": "CodeLens (Launch) - HMM0",
+            "name": "CodeLens (Launch) - HMM1",
             "request": "launch",
-            "mainClass": "HMM0",
-            "projectName": "HMM0_f32865cc",
-            "args": " < test.in"
+            "mainClass": "HMM1",
+            "projectName": "HMM1_f32865cd",
+            "args": "< test.in"
         }
     ]
 }

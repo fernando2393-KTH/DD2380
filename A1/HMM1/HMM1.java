@@ -3,6 +3,7 @@ public class HMM1 {
 
         HMM.read_hmm();
 
-        HMM.next_emission();
+        HMM.fwdResult();
+        
     } 
 } 

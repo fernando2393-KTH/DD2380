@@ -1,6 +1,5 @@
 // Class to enclose all matrix operations
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
 
 public class matrixOps {
     // IO
@@ -25,8 +24,8 @@ public class matrixOps {
         return matrix;
     }
 
-    public static double[] read_vector() {
-        BufferedReader reader =  new BufferedReader(new InputStreamReader(System.in));
+    public static double[] read_vector(BufferedReader reader) {
+
         String encoded_matrix;
         try {
             encoded_matrix = reader.readLine();
