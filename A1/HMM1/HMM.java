@@ -40,14 +40,14 @@ public class HMM {
     public double sequence_probability(int[] observations) {
         double[][] alpha = 
             mat_ops.vector_col_elem_wise_mult(pi, B, observations[0]);
-        
+
         // TODO(oleguer): Convert to ln
         for (int i = 1; i < observations.length; i++)
             alpha = mat_ops.vector_col_elem_wise_mult(
                     mat_ops.multiply(alpha, A), B, observations[i]);
 
         double sum = 0;
-        for (int i = 0; i < alpha.length; i++)
+        for (int i = 0; i < alpha[0].length; i++)
             sum += alpha[0][i];
         return sum;
     }
