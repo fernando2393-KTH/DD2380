@@ -2,6 +2,7 @@
 import java.io.BufferedReader; 
 import java.io.IOException; 
 import java.io.InputStreamReader;
+import java.lang.Math;
 
 public class matrixOps {
     //IO
@@ -103,5 +104,12 @@ public class matrixOps {
         for (int i = 0; i < cols_vect; i++)
             result[0][i] = vect[0][i]*mat[i][col];
         return result;
+    }
+
+    // BASIC ARITHMETIC
+    // Returns the ssave multiplication of two doubles
+    private static double save_mult(double a, double b) {
+        double log_sum = Math.log(a) + Math.log(b);
+        return Math.exp(log_sum);
     }
 }
