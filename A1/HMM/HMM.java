@@ -41,13 +41,13 @@ public class HMM {
     // a given sequence of observations
     public static double[][] fwdAlgorithm(int[] observations) {
 
-        double[][] alpha_mat = new double[states][observations.length]; // Matrix of all computed alphas
+        double[][] alpha_mat = new double[observations.length][states]; // Matrix of all computed alphas
 
         double[][] alpha = 
             matrixOps.vector_col_elem_wise_mult(pi, B, observations[0]);
 
         for (int i = 0; i < states; i++){
-            alpha_mat[i][0] = alpha[0][i];
+            alpha_mat[0][i] = alpha[0][i];
         }
 
         for (int i = 1; i < observations.length; i++){
@@ -55,7 +55,7 @@ public class HMM {
                     matrixOps.multiply(alpha, A), B, observations[i]);
 
             for (int j = 0; j < states; j++){
-                alpha_mat[j][0] = alpha[0][j];
+                alpha_mat[i][j] = alpha[0][j];
             }
         }
 

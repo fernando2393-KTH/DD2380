@@ -19,8 +19,8 @@ public class HMM1 {
         double[][] alpha_mat = HMM.fwdAlgorithm(obs);
 
         double sum = 0;
-        for (int i = 0; i < alpha_mat.length; i++) {
-            sum += alpha_mat[i][obs[0]];
+        for (int i = 0; i < alpha_mat[0].length; i++) {
+            sum += alpha_mat[alpha_mat.length - 1][i];
         }
         
         System.out.println(sum);
