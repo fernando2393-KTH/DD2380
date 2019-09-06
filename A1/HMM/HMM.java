@@ -54,6 +54,8 @@ public class HMM {
         return sum;
     }
 
+
+    /* Uses backward algorithm to compute the sequence of betas */
     public static double[][] bkwAlgorithm(int[] observations) {
         double[][] beta = new double[states][observations.length];
         
@@ -110,4 +112,12 @@ public class HMM {
         }
         return result;
     }
+
+    public static double[][] computeGamma(){
+
+        double[][] result;
+
+        return result;
+    }
+
 }
