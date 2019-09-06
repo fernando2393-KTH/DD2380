@@ -15,8 +15,15 @@ public class HMM1 {
         } catch (Exception e) {
             System.err.println(e);
         }
+
+        double[][] alpha_mat = HMM.fwdAlgorithm(obs);
+
+        double sum = 0;
+        for (int i = 0; i < alpha_mat[0].length; i++) {
+            sum += alpha_mat[alpha_mat.length - 1][i];
+        }
         
-        System.out.println(HMM.fwdAlgorithm(obs));
+        System.out.println(sum);
 
     } 
 } 
