@@ -113,11 +113,11 @@ public class HMM {
         return result;
     }
 
-    public static double[][] computeGamma(){
+    // public static double[][] computeGamma(){
 
-        double[][] result;
+    //     double[][] result;
 
-        return result;
-    }
+    //     return result;
+    // }
 
 }
