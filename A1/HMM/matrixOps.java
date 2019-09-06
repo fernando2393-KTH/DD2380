@@ -3,7 +3,6 @@ import java.awt.List;
 import java.io.BufferedReader;
 import java.lang.Math;
 import java.util.ArrayList;
-import javafx.util.Pair;
 
 public class matrixOps {
     // IO
@@ -91,7 +90,7 @@ public class matrixOps {
         return result;
     }
 
-    public static Pair<Double, Integer> maxVectorMatrixCol(double [][] vector, double [][] matrix, int col){
+    public static Pair maxVectorMatrixCol(double [][] vector, double [][] matrix, int col){
 
         int rows_mat = matrix.length;
         int cols_vect = vector[0].length;
@@ -99,13 +98,9 @@ public class matrixOps {
             return null;
 
         double maximum = -1;
-
         int max_position = -1;
-        
         for(int i = 0;  i < vector[0].length; i++){
-
             double value = vector[0][i] * matrix[i][col];
-
             if(value > maximum){
                 maximum = value;
                 max_position = i;
@@ -117,7 +112,10 @@ public class matrixOps {
             // }
         }
 
-        return new Pair<Double, Integer>(maximum, max_position);
+        Pair result = new Pair();
+        result.value = maximum;
+        result.position = max_position;
+        return result;
 
     }
 
