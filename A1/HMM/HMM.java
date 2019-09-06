@@ -10,12 +10,14 @@ public class HMM {
     static double[][] A;
     static double[][] B;
     static double[][] pi;
+    static int states;
 
     // Reads values from console and populates A, B, pi
     public static void read_hmm(BufferedReader reader) {
         A = matrixOps.read_matrix(reader);
         B = matrixOps.read_matrix(reader);
         pi = matrixOps.read_matrix(reader);   
+        states = A.length;
     }
 
     // Reads values from console and populates A, B, pi
@@ -50,6 +52,26 @@ public class HMM {
         for (int i = 0; i < alpha[0].length; i++)
             sum += alpha[0][i];
         return sum;
+    }
+
+    public static double[][] bkwAlgorithm(int[] observations) {
+        double[][] beta = new double[states][observations.length];
+        
+        // Initialize
+        for (int  i = 0; i < states; i++) {
+            beta[i][observations.length - 1] = 1;
+        }
+
+        // Main loop
+        for (int t = observations.length-2; t > -1; t--) {
+            for (int i = 0; i < states; i++) {
+                beta[i][t] = 0;
+                for (int j = 0; j < states; j++) {
+                    beta[i][t] += A[i][j]*B[j][observations[t+1]]*beta[j][t+1];
+                }
+            }
+        }
+        return beta;
     }
 
     // Uses viterbi algorithm to compute the most likely sequence
