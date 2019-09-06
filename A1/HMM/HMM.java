@@ -39,19 +39,30 @@ public class HMM {
 
     // Uses forward algorithm to compute probability of
     // a given sequence of observations
-    public static double fwdAlgorithm(int[] observations) {
+    public static double[][] fwdAlgorithm(int[] observations) {
+
+        double[][] alpha_mat = new double[states][observations.length]; // Matrix of all computed alphas
+
         double[][] alpha = 
             matrixOps.vector_col_elem_wise_mult(pi, B, observations[0]);
 
-        // TODO(oleguer): Convert to ln
-        for (int i = 1; i < observations.length; i++)
+        for (int i = 0; i < states; i++){
+            alpha_mat[i][0] = alpha[0][i];
+        }
+
+        for (int i = 1; i < observations.length; i++){
             alpha = matrixOps.vector_col_elem_wise_mult(
                     matrixOps.multiply(alpha, A), B, observations[i]);
 
-        double sum = 0;
+            for (int j = 0; j < states; j++){
+                alpha_mat[j][0] = alpha[0][j];
+            }
+        }
+
+        /*double sum = 0;
         for (int i = 0; i < alpha[0].length; i++)
-            sum += alpha[0][i];
-        return sum;
+            sum += alpha[0][i];*/
+        return alpha_mat;
     }
 
 
@@ -113,11 +124,11 @@ public class HMM {
         return result;
     }
 
-    public static double[][] computeGamma(){
+    // public static double[][] computeGamma(){
 
-        double[][] result;
+    //     double[][] result;
 
-        return result;
-    }
+    //     return result;
+    // }
 
 }
