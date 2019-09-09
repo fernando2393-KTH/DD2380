@@ -56,6 +56,20 @@ public class matrixOps {
         }
     }
 
+    // Given a console line, returns the encoded matrix
+    public static void print_matrix_as_row(double[][] mat) {
+        System.out.print(mat.length);  // Print rows
+        System.out.print(" ");
+        System.out.print(mat[0].length);  // Print cols
+        for (int i = 0; i < mat.length; i++) {
+            for (int j = 0; j < mat[0].length; j++) {
+                System.out.print(" ");
+                System.out.print(mat[i][j]);
+            }
+        }
+        System.out.println();    
+    }
+
     // ARITHMETIC
     // returns mat_a*mat_b
     public static double[][] multiply(double[][] mat_a, double[][] mat_b) {

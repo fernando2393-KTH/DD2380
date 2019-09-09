@@ -14,8 +14,8 @@ public class HMM {
     static int states;
     static int emissions;
 
-    public static final int ITERATION_LIMIT = 3;
-    public static final double NON_IMPROVEMENT = 1e-6;
+    public static final int ITERATION_LIMIT = 10000;
+    // public static final double NON_IMPROVEMENT = 1e-6;
 
     // Reads values from console and populates A, B, pi
     public static void read_hmm(BufferedReader reader) {
@@ -174,9 +174,9 @@ public class HMM {
             }
         }
         // T-1 Special case
-        // for (int i = 0; i < states; i++) {
-        //     gamma[i][T-1] = alpha[i][T-1];
-        // }
+        for (int i = 0; i < states; i++) {
+            gamma[T-1][i] = alpha[i][T-1];
+        }
 
         // Update A
         for (int i = 0; i < states; i++) {
@@ -219,9 +219,6 @@ public class HMM {
 
         while (iterations < ITERATION_LIMIT &&
             log_prob >= log_prob_ant) {
-            System.out.println("###############################");
-            print_hmm();
-
             updateHMM(observations);
             
             Pair<double[][], double[]> alpha_info = fwdAlgorithm(observations);
@@ -234,8 +231,8 @@ public class HMM {
 
             log_prob_ant = log_prob;
             iterations++;
-            System.out.println("###############################");
-            print_hmm();
+            // System.out.println("###############################");
+            // print_hmm();
         }
     }
 }

@@ -19,6 +19,8 @@ public class HMM3 {
         }
 
         HMM.baumWelch(obs);
-        HMM.print_hmm();
+        //HMM.print_hmm();
+        matrixOps.print_matrix_as_row(HMM.A);
+        matrixOps.print_matrix_as_row(HMM.B);
     }
 }
