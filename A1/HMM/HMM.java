@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
+import java.lang.Math;
 
 public class HMM {
     // PUBLIC
@@ -11,6 +12,10 @@ public class HMM {
     static double[][] B;
     static double[][] pi;
     static int states;
+    static int emissions;
+
+    public static final int ITERATION_LIMIT = 3;
+    public static final double NON_IMPROVEMENT = 1e-6;
 
     // Reads values from console and populates A, B, pi
     public static void read_hmm(BufferedReader reader) {
@@ -18,6 +23,7 @@ public class HMM {
         B = matrixOps.read_matrix(reader);
         pi = matrixOps.read_matrix(reader);   
         states = A.length;
+        emissions = B[0].length;
     }
 
     // Reads values from console and populates A, B, pi
@@ -39,44 +45,62 @@ public class HMM {
 
     // Uses forward algorithm to compute probability of
     // a given sequence of observations
-    public static double[][] fwdAlgorithm(int[] observations) {
+    public static Pair<double[][], double[]> fwdAlgorithm(int[] observations) {
+        int T = observations.length;
+        double[][] alpha = new double[states][T]; // Matrix of all computed alphas
+        double[] alpha_norm_ctes = new double[T];
 
-        double[][] alpha_mat = new double[states][observations.length]; // Matrix of all computed alphas
-        double[][] alpha = 
-            matrixOps.vector_col_elem_wise_mult(pi, B, observations[0]);
-
-        for (int i = 0; i < states; i++){
-            alpha_mat[i][0] = alpha[0][i];
+        // Compute for case t=0:
+        for (int i = 0; i < states; i++) {
+            alpha[i][0] = pi[0][i] * B[i][observations[0]];
+            alpha_norm_ctes[0] += alpha[i][0];
         }
+        alpha_norm_ctes[0] = 1/alpha_norm_ctes[0];
 
-        for (int i = 1; i < observations.length; i++) {
-            alpha = matrixOps.vector_col_elem_wise_mult(
-                    matrixOps.multiply(alpha, A), B, observations[i]);
+        // Normalize alpha (t=1):
+        for (int i = 0; i < states; i++)
+            alpha[i][0] = alpha[i][0]/alpha_norm_ctes[0];
 
-            for (int j = 0; j < states; j++){
-                alpha_mat[j][i] = alpha[0][j];
+        // Compute for t>0:
+        for (int t = 1; t < T; t++) {
+            for (int i = 0; i < states; i++) {
+                alpha[i][t] = 0;
+                for (int j = 1; j < states; j++) {
+                    alpha[i][t] += alpha[j][t-1]*A[j][i];
+                }
+                alpha[i][t] = alpha[i][t]*B[i][observations[t]];
+                alpha_norm_ctes[t] += alpha[i][t];
+            }
+            alpha_norm_ctes[t] = 1/alpha_norm_ctes[t];
+            for (int i = 0; i < states; i++) {
+                alpha[i][t] = alpha[i][t]*alpha_norm_ctes[t];
             }
         }
-        return alpha_mat;
+        Pair<double[][], double[]> result = new Pair<double[][], double[]>();
+        result.first = alpha;
+        result.second = alpha_norm_ctes;
+        return result;
     }
 
-
     /* Uses backward algorithm to compute the sequence of betas */
-    public static double[][] bkwAlgorithm(int[] observations) {
-        double[][] beta = new double[states][observations.length];
+    public static double[][] bkwAlgorithm(int[] observations, double[] norm_ctes) {
+        int T = observations.length;
+        double[][] beta = new double[states][T];
         
         // Initialize
         for (int  i = 0; i < states; i++) {
-            beta[i][observations.length - 1] = 1;
+            beta[i][observations.length - 1] = norm_ctes[T-1];
         }
 
         // Main loop
-        for (int t = observations.length-2; t > -1; t--) {
+        for (int t = T-2; t > -1; t--) {
             for (int i = 0; i < states; i++) {
                 beta[i][t] = 0;
                 for (int j = 0; j < states; j++) {
                     beta[i][t] += A[i][j]*B[j][observations[t+1]]*beta[j][t+1];
                 }
+                // scale βt(i) with same scale factor as αt(i)
+                beta[i][t] = norm_ctes[t]*beta[i][t];
             }
         }
         return beta;
@@ -95,9 +119,9 @@ public class HMM {
             double [][] delta = new double [1][pi[0].length];
             for(int j = 0; j < pi[0].length; j++){ // Per state
 
-                Pair max_pair = matrixOps.maxVectorMatrixCol(deltaPrev, A, j);
-                path[j][i] = max_pair.position;
-                delta[0][j] = max_pair.value * B[j][observations[i]];
+                Pair<Double, Integer> max_pair = matrixOps.maxVectorMatrixCol(deltaPrev, A, j);
+                path[j][i] = max_pair.second;
+                delta[0][j] = max_pair.first * B[j][observations[i]];
             }
 
             deltaPrev = delta; // Update delta
@@ -119,11 +143,99 @@ public class HMM {
         return result;
     }
 
-    // public static double[][] computeGamma(){
+    public static void updateHMM(int[] observations) {
+        int T = observations.length;
 
-    //     double[][] result;
+        // Forward pass
+        Pair<double[][], double[]> alpha_info = fwdAlgorithm(observations);
+        double[][] alpha = alpha_info.first;
+        double[] norm_ctes = alpha_info.second;
 
-    //     return result;
-    // }
+        // Backward pass
+        double[][] beta = bkwAlgorithm(observations, norm_ctes);
 
+        // Compute di_gamma & gamma
+        // (OBS: NO need to normalize gammas since we use both alpha and beta)
+        double[][][] di_gamma = new double[T][states][states];
+        double[][] gamma = new double[T][states];
+        for (int t = 0; t < T-1; t++) {
+            for (int i = 0; i < states; i++) {
+                // double alpha_sum = 0;
+                // for (int k = 0; k < states; k++) {
+                //     alpha_sum += alpha[k][T-1];
+                // }
+                // OBS: alpha_sum will always be 1 since its normalized
+                gamma[t][i] = 0;
+                for (int j = 0; j < states; j++) {
+                    // di_gamma[t][i][j] = (alpha[i][t] * A[i][j] * B[j][observations[t+1]] * beta[j][t+1]) / alpha_sum;
+                    di_gamma[t][i][j] = (alpha[i][t] * A[i][j] * B[j][observations[t+1]] * beta[j][t+1]);
+                    gamma[t][i] += di_gamma[t][i][j];
+                }
+            }
+        }
+        // T-1 Special case
+        // for (int i = 0; i < states; i++) {
+        //     gamma[i][T-1] = alpha[i][T-1];
+        // }
+
+        // Update A
+        for (int i = 0; i < states; i++) {
+            for (int j = 0; j < states; j++) {
+                double gamma_sum = 0;
+                double di_gamma_sum = 0;
+                for (int t = 0; t < T-1; t++) {
+                    gamma_sum += gamma[t][i];
+                    di_gamma_sum += di_gamma[t][i][j];
+                }
+                A[i][j] = di_gamma_sum/gamma_sum;
+            }
+        }
+
+        // Update B
+        for (int i = 0; i < states; i++) {
+            for (int k = 0; k < emissions; k++) {
+                double gamma_sum = 0;
+                double di_gamma_sum = 0;
+                for (int t = 0; t < T-1; t++) {
+                    gamma_sum += gamma[t][i];
+                    if (observations[t] == k) {
+                        di_gamma_sum += gamma[t][i];
+                    }
+                }
+                B[i][k] = di_gamma_sum/gamma_sum;
+            }
+        }
+
+        // Update pi
+        for (int i = 0; i < states; i++) {
+            pi[0][i] = gamma[0][i];
+        }
+    }
+
+    public static void baumWelch(int[] observations) {
+        int iterations = 0;
+        double log_prob_ant = -1;
+        double log_prob = 0;
+
+        while (iterations < ITERATION_LIMIT &&
+            log_prob >= log_prob_ant) {
+            System.out.println("###############################");
+            print_hmm();
+
+            updateHMM(observations);
+            
+            Pair<double[][], double[]> alpha_info = fwdAlgorithm(observations);
+            double[] norm_ctes = alpha_info.second;
+            
+            log_prob = 0;
+            for (int i = 0; i < norm_ctes.length; i++) {
+                log_prob -= Math.log(norm_ctes[i]);
+            }
+
+            log_prob_ant = log_prob;
+            iterations++;
+            System.out.println("###############################");
+            print_hmm();
+        }
+    }
 }

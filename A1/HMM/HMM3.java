@@ -1,8 +1,9 @@
-// Solution of HMM2 problem
+
+// Solution of HMM1 problem
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-public class HMM2 {
+public class HMM3 {
     public static void main(String[] args) {
         // Reader to read from terminal
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -17,13 +18,7 @@ public class HMM2 {
             System.err.println(e);
         }
 
-        int[] sequence = HMM.viterbiAlgorithm(obs);
-
-        System.out.print(sequence[0]);
-        for (int i = 1; i < sequence.length; i++){
-            System.out.print(" ");
-            System.out.print(sequence[i]);
-        }
-        System.out.println();
+        HMM.baumWelch(obs);
+        HMM.print_hmm();
     }
 }

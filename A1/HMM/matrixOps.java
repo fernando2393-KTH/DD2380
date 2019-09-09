@@ -79,7 +79,6 @@ public class matrixOps {
     // given a vector, a matrix and  a col_id, returns vector of element-wise
     // multiplication of vector values and given column (useful at forward alg)
     public static double[][] vector_col_elem_wise_mult(double[][] vect, double[][] mat, int col) {
-
         int rows_mat = mat.length;
         int cols_vect = vect[0].length;
         if (cols_vect != rows_mat)
@@ -90,7 +89,7 @@ public class matrixOps {
         return result;
     }
 
-    public static Pair maxVectorMatrixCol(double [][] vector, double [][] matrix, int col){
+    public static Pair<Double, Integer> maxVectorMatrixCol(double [][] vector, double [][] matrix, int col){
 
         int rows_mat = matrix.length;
         int cols_vect = vector[0].length;
@@ -112,9 +111,9 @@ public class matrixOps {
             // }
         }
 
-        Pair result = new Pair();
-        result.value = maximum;
-        result.position = max_position;
+        Pair<Double, Integer> result = new Pair<Double, Integer>();
+        result.first = maximum;
+        result.second = max_position;
         return result;
 
     }
@@ -122,6 +121,8 @@ public class matrixOps {
     // BASIC ARITHMETIC
     // Returns the ssave multiplication of two doubles
     private static double safe_mult(double a, double b) {
+        if (a == 0 || b == 0)
+            return 0;
         double log_sum = Math.log(a) + Math.log(b);
         return Math.exp(log_sum);
     }
