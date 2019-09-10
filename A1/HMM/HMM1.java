@@ -16,14 +16,14 @@ public class HMM1 {
             System.err.println(e);
         }
 
-        double[][] alpha_mat = HMM.fwdAlgorithm(obs);
+        Pair<double[][], double[]> alpha_info = HMM.fwdAlgorithm(obs);
+        double[] ctes = alpha_info.second;
 
-        double sum = 0;
-        for (int i = 0; i < alpha_mat.length; i++) {
-            sum += alpha_mat[i][alpha_mat[0].length - 1];
+        double cte = 1;
+        for (int i = 0; i < ctes.length; i++) {
+            cte = cte/ctes[i];
         }
-        
-        System.out.println(sum);
 
+        System.out.println(cte);
     } 
 } 

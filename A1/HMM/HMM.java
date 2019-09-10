@@ -14,7 +14,7 @@ public class HMM {
     static int states;
     static int emissions;
 
-    public static final int ITERATION_LIMIT = 10000;
+    public static final int ITERATION_LIMIT = 100;
     // public static final double NON_IMPROVEMENT = 1e-6;
 
     // Reads values from console and populates A, B, pi
@@ -48,37 +48,39 @@ public class HMM {
     public static Pair<double[][], double[]> fwdAlgorithm(int[] observations) {
         int T = observations.length;
         double[][] alpha = new double[states][T]; // Matrix of all computed alphas
-        double[] alpha_norm_ctes = new double[T];
+        double[] norm_ctes = new double[T];
 
         // Compute for case t=0:
+        norm_ctes[0] = 0;
         for (int i = 0; i < states; i++) {
             alpha[i][0] = pi[0][i] * B[i][observations[0]];
-            alpha_norm_ctes[0] += alpha[i][0];
+            norm_ctes[0] += alpha[i][0];
         }
-        alpha_norm_ctes[0] = 1/alpha_norm_ctes[0];
 
         // Normalize alpha (t=1):
+        norm_ctes[0] = 1/norm_ctes[0];
         for (int i = 0; i < states; i++)
-            alpha[i][0] = alpha[i][0]/alpha_norm_ctes[0];
+            alpha[i][0] = norm_ctes[0]*alpha[i][0];
 
         // Compute for t>0:
         for (int t = 1; t < T; t++) {
+            norm_ctes[t] = 0;
             for (int i = 0; i < states; i++) {
                 alpha[i][t] = 0;
-                for (int j = 1; j < states; j++) {
+                for (int j = 0; j < states; j++) {
                     alpha[i][t] += alpha[j][t-1]*A[j][i];
                 }
                 alpha[i][t] = alpha[i][t]*B[i][observations[t]];
-                alpha_norm_ctes[t] += alpha[i][t];
+                norm_ctes[t] += alpha[i][t];
             }
-            alpha_norm_ctes[t] = 1/alpha_norm_ctes[t];
+            norm_ctes[t] = 1/norm_ctes[t];
             for (int i = 0; i < states; i++) {
-                alpha[i][t] = alpha[i][t]*alpha_norm_ctes[t];
+                alpha[i][t] = alpha[i][t]*norm_ctes[t];
             }
         }
         Pair<double[][], double[]> result = new Pair<double[][], double[]>();
         result.first = alpha;
-        result.second = alpha_norm_ctes;
+        result.second = norm_ctes;
         return result;
     }
 
@@ -231,8 +233,7 @@ public class HMM {
 
             log_prob_ant = log_prob;
             iterations++;
-            // System.out.println("###############################");
-            // print_hmm();
         }
+        // System.out.println(iterations);
     }
 }
