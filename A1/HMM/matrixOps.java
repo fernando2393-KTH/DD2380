@@ -47,10 +47,12 @@ public class matrixOps {
         System.out.print(mat.length);  // Print rows
         System.out.print(" ");
         System.out.print(mat[0].length);  // Print cols
+        System.out.println();  // Print cols
         for (int i = 0; i < mat.length; i++) {
             for (int j = 0; j < mat[0].length; j++) {
                 System.out.print(" ");
-                System.out.print(mat[i][j]);
+                double roundOff = Math.round(mat[i][j] * 10000.0) / 10000.0;
+                System.out.print(roundOff);
             }
             System.out.println();
         }
@@ -131,6 +133,19 @@ public class matrixOps {
         return result;
 
     }
+
+    public static double normFrob(double[][] matrix) {
+        double norm = 0.0;
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                norm = Math.hypot(norm, matrix[i][j]);
+            }
+        }
+        return norm;
+    }
+
 
     // BASIC ARITHMETIC
     // Returns the ssave multiplication of two doubles

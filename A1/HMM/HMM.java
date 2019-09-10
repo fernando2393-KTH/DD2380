@@ -14,7 +14,7 @@ public class HMM {
     static int states;
     static int emissions;
 
-    public static final int ITERATION_LIMIT = 100;
+    public static final int ITERATION_LIMIT = 1000;
     // public static final double NON_IMPROVEMENT = 1e-6;
 
     // Reads values from console and populates A, B, pi
@@ -217,10 +217,10 @@ public class HMM {
     public static void baumWelch(int[] observations) {
         int iterations = 0;
         double log_prob_ant = -1;
-        double log_prob = 0;
+        double log_prob = -1;
 
         while (iterations < ITERATION_LIMIT &&
-            log_prob >= log_prob_ant) {
+            log_prob <= log_prob_ant) {
             updateHMM(observations);
             
             Pair<double[][], double[]> alpha_info = fwdAlgorithm(observations);
@@ -230,6 +230,7 @@ public class HMM {
             for (int i = 0; i < norm_ctes.length; i++) {
                 log_prob -= Math.log(norm_ctes[i]);
             }
+            // System.out.print(" " + log_prob);
 
             log_prob_ant = log_prob;
             iterations++;
