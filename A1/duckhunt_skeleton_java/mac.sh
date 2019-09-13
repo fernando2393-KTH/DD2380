@@ -4,6 +4,9 @@ mode=$1
 
 environment=$2
 
+rm player2server
+rm server2player
+
 make
 
 echo "make finished!"
