@@ -1,4 +1,6 @@
 #!/bin/bash
+rm player2server
+rm server2player
 
 mode=$1
 
@@ -17,7 +19,8 @@ then
     if [ "$mode" -eq 1 ]
     then
         java Main verbose server < player2server > server2player
-        osascript -e 'tell app "Terminal" to do script "cd \"`pwd`\"; java Main verbose > player2server < server2player"'
+        # osascript -e 'tell app "Terminal" to do script "cd \"`pwd`\"; java Main verbose > player2server < server2player"'
+        gnome-terminal -e java Main verbose > player2server < server2player
     fi
     if [ "$mode" -eq 2 ]
     then

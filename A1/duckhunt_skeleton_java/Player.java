@@ -1,6 +1,4 @@
-
 class Player {
-
     public Player() {
     }
 
@@ -26,10 +24,13 @@ class Player {
          */
 
         // This line chooses not to shoot.
-        return cDontShoot;
+        // return cDontShoot;
 
         // This line would predict that bird 0 will move right and shoot at it.
-        // return Action(0, MOVE_RIGHT);
+        int min = 0;
+        int max = pState.getNumBirds();
+        int bird = (int)(Math.random() * ((max - min) + 1)) + min;
+        return new Action(bird, Constants.MOVE_RIGHT);
     }
 
     /**
@@ -49,6 +50,8 @@ class Player {
          * Here you should write your clever algorithms to guess the species of
          * each bird. This skeleton makes no guesses, better safe than sorry!
          */
+        System.err.println("guessing");
+
 
         int[] lGuess = new int[pState.getNumBirds()];
         for (int i = 0; i < pState.getNumBirds(); ++i)
