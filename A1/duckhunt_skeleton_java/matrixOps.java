@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class matrixOps {
     // IO
     // Read matrix from console
-    public static double[][] read_matrix(BufferedReader reader) {        
+    public double[][] read_matrix(BufferedReader reader) {        
         String encoded_matrix;
         try {
             encoded_matrix = reader.readLine();
@@ -26,7 +26,7 @@ public class matrixOps {
         return matrix;
     }
 
-    public static int[] read_vector(BufferedReader reader) {
+    public int[] read_vector(BufferedReader reader) {
         String encoded_matrix;
         try {
             encoded_matrix = reader.readLine();
@@ -44,52 +44,52 @@ public class matrixOps {
     }
     
     // Given a console line, returns the encoded matrix
-    public static void print_matrix(double[][] mat) {
-        System.out.print(mat.length);  // Print rows
-        System.out.print(" ");
-        System.out.print(mat[0].length);  // Print cols
-        System.out.println();  // Print cols
+    public void print_matrix(double[][] mat) {
+        System.err.print(mat.length);  // Print rows
+        System.err.print(" ");
+        System.err.print(mat[0].length);  // Print cols
+        System.err.println();  // Print cols
         for (int i = 0; i < mat.length; i++) {
             for (int j = 0; j < mat[0].length; j++) {
-                System.out.print(" ");
-                double roundOff = Math.round(mat[i][j] * 10000.0) / 10000.0;
-                System.out.print(roundOff);
+                System.err.print(" ");
+                double roundOff = Math.round(mat[i][j] * 100.0) / 100.0;
+                System.err.print(roundOff);
             }
-            System.out.println();
-            System.out.println();
+            System.err.println();
+            System.err.println();
         }
     }
 
     // Given a console line, returns the encoded matrix
-    public static void print_vector(double[] mat) {
-        System.out.print(mat.length);  // Print rows
-        System.out.print(": ");
-        System.out.println();  // Print cols
+    public void print_vector(double[] mat) {
+        System.err.print(mat.length);  // Print rows
+        System.err.print(": ");
+        System.err.println();  // Print cols
         for (int i = 0; i < mat.length; i++) {
-                System.out.print(" ");
+                System.err.print(" ");
                 double roundOff = Math.round(mat[i] * 10000.0) / 10000.0;
-                System.out.print(roundOff);
+                System.err.print(roundOff);
             }
-            System.out.println();
+            System.err.println();
     }
 
     // Given a console line, returns the encoded matrix
-    public static void print_matrix_as_row(double[][] mat) {
-        System.out.print(mat.length);  // Print rows
-        System.out.print(" ");
-        System.out.print(mat[0].length);  // Print cols
+    public void print_matrix_as_row(double[][] mat) {
+        System.err.print(mat.length);  // Print rows
+        System.err.print(" ");
+        System.err.print(mat[0].length);  // Print cols
         for (int i = 0; i < mat.length; i++) {
             for (int j = 0; j < mat[0].length; j++) {
-                System.out.print(" ");
-                System.out.print(mat[i][j]);
+                System.err.print(" ");
+                System.err.print(mat[i][j]);
             }
         }
-        System.out.println();    
+        System.err.println();    
     }
 
     // ARITHMETIC
     // returns mat_a*mat_b
-    public static double[][] multiply(double[][] mat_a, double[][] mat_b) {
+    public double[][] multiply(double[][] mat_a, double[][] mat_b) {
         int rows_a = mat_a.length;
         int cols_a = mat_a[0].length;
         int rows_b = mat_b.length;
@@ -109,7 +109,7 @@ public class matrixOps {
 
     // given a vector, a matrix and  a col_id, returns vector of element-wise
     // multiplication of vector values and given column (useful at forward alg)
-    public static double[][] vector_col_elem_wise_mult(double[][] vect, double[][] mat, int col) {
+    public double[][] vector_col_elem_wise_mult(double[][] vect, double[][] mat, int col) {
         int rows_mat = mat.length;
         int cols_vect = vect[0].length;
         if (cols_vect != rows_mat)
@@ -120,7 +120,7 @@ public class matrixOps {
         return result;
     }
 
-    public static Pair<Double, Integer> maxVectorMatrixCol(double [][] vector, double [][] matrix, int col){
+    public Pair<Double, Integer> maxVectorMatrixCol(double [][] vector, double [][] matrix, int col){
 
         int rows_mat = matrix.length;
         int cols_vect = vector[0].length;
@@ -149,7 +149,7 @@ public class matrixOps {
 
     }
 
-    public static double normFrob(double[][] matrix) {
+    public double normFrob(double[][] matrix) {
         double norm = 0.0;
         int rows = matrix.length;
         int cols = matrix[0].length;
@@ -163,14 +163,14 @@ public class matrixOps {
 
     
     // OTHER
-    public static int[] push(int[] arr, int item) {
+    public int[] push(int[] arr, int item) {
         int[] tmp = Arrays.copyOf(arr, arr.length + 1);
         tmp[tmp.length - 1] = item;
         return tmp;
     }
 
     // Returns random array that adds up to 1
-    public static  double[] randomArray(int length) {
+    public  double[] randomArray(int length) {
         double[] vector = new double[length];
         // Generate random values
         double sum = 0;
@@ -186,7 +186,7 @@ public class matrixOps {
     }
 
     // Returns a random matrix where rows add up to 1
-    public static double[][] randomMatrix(int size_x, int size_y) {
+    public double[][] randomMatrix(int size_x, int size_y) {
         double[][] matrix = new double[size_x][size_y];
         for (int i = 0; i < size_x; i++) {
             double[] row_values = randomArray(size_y);

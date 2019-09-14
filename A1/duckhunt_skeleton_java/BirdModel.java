@@ -1,6 +1,8 @@
+import java.util.Arrays;
+
 public class BirdModel extends HMM {
-    public static int[] observations;  // Array of seen observations until now
-    public static double confidence;  // Confidence of the model
+    public int[] observations = new int[0];  // Array of seen observations until now
+    public double confidence;  // Confidence of the model
     // OBS: confidence is negative and the highest, the better: log(prob)
 
     // Class constructor (randomly initializes A, B, pi)
@@ -13,7 +15,7 @@ public class BirdModel extends HMM {
     }
 
     // Append an observation to BirdModel observations
-    public static void addObservation(int obs) {
+    public void addObservation(int obs) {
         observations = matrixOps.push(observations, obs);
     }
 
@@ -37,12 +39,27 @@ public class BirdModel extends HMM {
         // Get the highest movement probability
         double max = -1;
         int max_index = -1;
-        for (int i = 0; i < super.states; i++) {
+        for (int i = 0; i < super.emissions; i++) {
+            // System.err.println(emission_prob[0][i]);
+            // System.err.print("max: ");
+            // System.err.println(max);
             if (emission_prob[0][i] > max) {
                 max = emission_prob[0][i];
                 max_index = i;
             }
+
         }
+        // System.exit(0);
         return max_index;
+    }
+
+    public void printBirdInfo() {
+        System.err.println("----------V");
+        super.print_hmm();
+        System.err.println("OBSs:");
+        System.err.println(Arrays.toString(observations));
+        System.err.println("Conf:");
+        System.err.println(confidence);
+        System.err.println("############");
     }
 }
