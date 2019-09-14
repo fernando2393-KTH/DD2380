@@ -52,6 +52,8 @@ public class GameState {
         return mNumNewTurns;
     }
 
+
+    
     /**
      * The following methods are used by the Client class.
      * Don't use them yourself!

@@ -1,5 +1,10 @@
 class Player {
+    public static final Action cDontShoot = new Action(-1, -1);
+    private int timestep;
+    private BirdModel[] bird_models;
+
     public Player() {
+        timestep = 0;
     }
 
     /**
@@ -18,19 +23,18 @@ class Player {
      * @return the prediction of a bird we want to shoot at, or cDontShoot to pass
      */
     public Action shoot(GameState pState, Deadline pDue) {
-        /*
-         * Here you should write your clever algorithms to get the best action.
-         * This skeleton never shoots.
-         */
+        timestep += pState.getNumNewTurns();
 
-        // This line chooses not to shoot.
-        // return cDontShoot;
+        if (timestep < 60) {
+            return cDontShoot;
+        }
+        return cDontShoot;
 
-        // This line would predict that bird 0 will move right and shoot at it.
-        int min = 0;
-        int max = pState.getNumBirds();
-        int bird = (int)(Math.random() * ((max - min) + 1)) + min;
-        return new Action(bird, Constants.MOVE_RIGHT);
+        // // This line would predict that bird 0 will move right and shoot at it.
+        // int min = 0;
+        // int max = pState.getNumBirds();
+        // int bird = (int)(Math.random() * ((max - min) + 1)) + min;
+        // return new Action(bird, Constants.MOVE_RIGHT);
     }
 
     /**
@@ -46,11 +50,8 @@ class Player {
      * @return a vector with guesses for all the birds
      */
     public int[] guess(GameState pState, Deadline pDue) {
-        /*
-         * Here you should write your clever algorithms to guess the species of
-         * each bird. This skeleton makes no guesses, better safe than sorry!
-         */
         System.err.println("guessing");
+        timestep = 0;
 
 
         int[] lGuess = new int[pState.getNumBirds()];
@@ -82,5 +83,4 @@ class Player {
     public void reveal(GameState pState, int[] pSpecies, Deadline pDue) {
     }
 
-    public static final Action cDontShoot = new Action(-1, -1);
 }
