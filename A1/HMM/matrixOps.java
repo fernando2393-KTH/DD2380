@@ -55,7 +55,21 @@ public class matrixOps {
                 System.out.print(roundOff);
             }
             System.out.println();
+            System.out.println();
         }
+    }
+
+    // Given a console line, returns the encoded matrix
+    public static void print_vector(double[] mat) {
+        System.out.print(mat.length);  // Print rows
+        System.out.print(": ");
+        System.out.println();  // Print cols
+        for (int i = 0; i < mat.length; i++) {
+                System.out.print(" ");
+                double roundOff = Math.round(mat[i] * 10000.0) / 10000.0;
+                System.out.print(roundOff);
+            }
+            System.out.println();
     }
 
     // Given a console line, returns the encoded matrix
