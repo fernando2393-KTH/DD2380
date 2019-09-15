@@ -16,25 +16,25 @@ public class HMMc {
         // Reader to read from terminal
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        //HMM.read_hmm(reader);
-        // TODO(Fernando): For question 8, instead of read_hmm, initialize it with r
+        HMM.read_hmm(reader);
+        
         // int states = 3;
         // int emissions = 4;
         // HMM.randomInit(states, emissions) // OBS: Question 9 is the same just
         // changing states param)
 
-        HMM.randomInit(3, 4);
+        //HMM.randomInit(4, 4);
 
         HMM.print_hmm(); // Printing the randomly generated matrix
 
 
         // Reads the first three lines for question 8, since matrix is initialized in other way
-        try {
+        /*try {
             reader.readLine();
             reader.readLine();
             reader.readLine();
         } catch (Exception e) {
-        }
+        }*/
 
         
         int[] obs = matrixOps.read_vector(reader);
