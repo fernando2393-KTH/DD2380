@@ -29,11 +29,11 @@ public class HMM {
 
     // Starts h,, with random values
     public static void randomInit(int st, int emi) {
+        states = st;
+        emissions = emi;
         A = matrixOps.randomMatrix(states, states, true);
         B = matrixOps.randomMatrix(states, emissions, true);
         pi = matrixOps.randomMatrix(1, states, false);
-        states = st;
-        emissions = emi;
     }
 
     // Reads values from console and populates A, B, pi

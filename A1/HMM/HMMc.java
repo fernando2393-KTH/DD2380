@@ -16,13 +16,27 @@ public class HMMc {
         // Reader to read from terminal
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        HMM.read_hmm(reader);
+        //HMM.read_hmm(reader);
         // TODO(Fernando): For question 8, instead of read_hmm, initialize it with r
         // int states = 3;
         // int emissions = 4;
         // HMM.randomInit(states, emissions) // OBS: Question 9 is the same just
         // changing states param)
 
+        HMM.randomInit(3, 4);
+
+        HMM.print_hmm(); // Printing the randomly generated matrix
+
+
+        // Reads the first three lines for question 8, since matrix is initialized in other way
+        try {
+            reader.readLine();
+            reader.readLine();
+            reader.readLine();
+        } catch (Exception e) {
+        }
+
+        
         int[] obs = matrixOps.read_vector(reader);
 
         try {
@@ -37,8 +51,6 @@ public class HMMc {
         double error_B_array[] = new double[obs.length / IT_INCREMENT];
         double error_pi_array[] = new double[obs.length / IT_INCREMENT];
 
-        // TODO(Fernando): Iterate over number of observations
-
         for (int i = 10; i < obs.length + 1; i = i + IT_INCREMENT) { // Increment of 10 observations per iteration
 
             Pair<Double, Integer> nw_details = HMM.baumWelchWithDetails(Arrays.copyOfRange(obs, 0, i)); // Increment
@@ -52,8 +64,6 @@ public class HMMc {
             error_pi_array[i / IT_INCREMENT - 1] = matrixOps.forbDistance(HMM.pi, pi_real);
 
         }
-
-        // TODO(Fernando) : save these variables into arrays and plot variable vs n_obs
 
         if (DEBUG) {
 
@@ -108,6 +118,8 @@ public class HMMc {
             System.out.println();
 
         }
+
+        HMM.print_hmm();
 
         // System.out.println("error_A: " + error_A);
         // System.out.println("error_B: " + error_B);
