@@ -261,7 +261,7 @@ public class HMM {
     }
 
     // Does baum-welch and returns iterations and final log(prob) to build graphs
-    public static Pair<Double, Double> baumWelchWithDetails(int[] observations) {
+    public static Pair<Double, Integer> baumWelchWithDetails(int[] observations) {
         int iterations = 0;
         double log_prob_ant = - (LOG_NON_IMPROVEMENT + 1);
         double log_prob = 0;
@@ -282,7 +282,7 @@ public class HMM {
                 log_prob_ant = log_prob - (LOG_NON_IMPROVEMENT + 1);
             iterations++;
         }
-        Pair<Double, Double> summary = new Pair<Double, Double>();
+        Pair<Double, Integer> summary = new Pair<Double, Integer>();
         summary.first = log_prob;
         summary.second = iterations;
         return summary;

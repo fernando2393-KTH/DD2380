@@ -2,12 +2,15 @@
 // Solution of HMM1 problem
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.Object;
+import java.util.Arrays;
 
 public class HMMc {
-    private static double[][] A_real = {{0.7, 0.05, 0.25}, {0.1, 0.8, 0.1}, {0.2, 0.3, 0.5}};
-    private static double[][] B_real = {{0.7, 0.2, 0.1, 0}, {0.1, 0.4, 0.3, 0.2}, {0, 0.1, 0.2, 0.7}};
-    private static double[][] pi_real = {{1, 0, 0}};
+    private static double[][] A_real = { { 0.7, 0.05, 0.25 }, { 0.1, 0.8, 0.1 }, { 0.2, 0.3, 0.5 } };
+    private static double[][] B_real = { { 0.7, 0.2, 0.1, 0 }, { 0.1, 0.4, 0.3, 0.2 }, { 0, 0.1, 0.2, 0.7 } };
+    private static double[][] pi_real = { { 1, 0, 0 } };
+
+    private static final int IT_INCREMENT = 10;
+    private static final boolean DEBUG = true;
 
     public static void main(String[] args) {
         // Reader to read from terminal
@@ -16,10 +19,11 @@ public class HMMc {
         HMM.read_hmm(reader);
         // TODO(Fernando): For question 8, instead of read_hmm, initialize it with r
         // int states = 3;
-        // int emissions =  4;
-        // HMM.randomInit(states, emissions) // OBS: Question 9 is the same just changing states param)
+        // int emissions = 4;
+        // HMM.randomInit(states, emissions) // OBS: Question 9 is the same just
+        // changing states param)
 
-        int [] obs = matrixOps.read_vector(reader);
+        int[] obs = matrixOps.read_vector(reader);
 
         try {
             reader.close();
@@ -27,16 +31,83 @@ public class HMMc {
             System.err.println(e);
         }
 
-        // TODO(Fernando): Iterate over number of observations
-        // for...
-            Pair<Double, Double> nw_details = HMM.baumWelchWithDetails(obs);
-            double last_log_prob = nw_details.first;
-            double iterations= nw_details.second;        
-            double error_A = matrixOps.forbDistance(HMM.A, A_real);
-            double error_B = matrixOps.forbDistance(HMM.B, B_real);
-            double error_pi = matrixOps.forbDistance(HMM.pi, pi_real);
-            // TODO(Fernando) : save this variables into arrays and plot variable vs n_obs
+        double last_log_prob_array[] = new double[obs.length / IT_INCREMENT];
+        double iterations_array[] = new double[obs.length / IT_INCREMENT];
+        double error_A_array[] = new double[obs.length / IT_INCREMENT];
+        double error_B_array[] = new double[obs.length / IT_INCREMENT];
+        double error_pi_array[] = new double[obs.length / IT_INCREMENT];
 
+        // TODO(Fernando): Iterate over number of observations
+
+        for (int i = 10; i < obs.length + 1; i = i + IT_INCREMENT) { // Increment of 10 observations per iteration
+
+            Pair<Double, Integer> nw_details = HMM.baumWelchWithDetails(Arrays.copyOfRange(obs, 0, i)); // Increment
+                                                                                                        // number of
+                                                                                                        // observations
+                                                                                                        // per iteration
+            last_log_prob_array[i / IT_INCREMENT - 1] = nw_details.first;
+            iterations_array[i / IT_INCREMENT - 1] = nw_details.second;
+            error_A_array[i / IT_INCREMENT - 1] = matrixOps.forbDistance(HMM.A, A_real);
+            error_B_array[i / IT_INCREMENT - 1] = matrixOps.forbDistance(HMM.B, B_real);
+            error_pi_array[i / IT_INCREMENT - 1] = matrixOps.forbDistance(HMM.pi, pi_real);
+
+        }
+
+        // TODO(Fernando) : save these variables into arrays and plot variable vs n_obs
+
+        if (DEBUG) {
+
+            for (int i = 0; i < obs.length / IT_INCREMENT; i++) {
+                if (i < obs.length / IT_INCREMENT - 1) {
+                    System.out.print(last_log_prob_array[i] + ", ");
+                } else {
+                    System.out.print(last_log_prob_array[i]);
+                }
+            }
+
+            System.out.println();
+
+            for (int i = 0; i < obs.length / IT_INCREMENT; i++) {
+                if (i < obs.length / IT_INCREMENT - 1) {
+                    System.out.print(iterations_array[i] + ", ");
+                } else {
+                    System.out.print(iterations_array[i]);
+                }
+            }
+
+            System.out.println();
+
+            for (int i = 0; i < obs.length / IT_INCREMENT; i++) {
+                if (i < obs.length / IT_INCREMENT - 1) {
+                    System.out.print(error_A_array[i] + ", ");
+                } else {
+                    System.out.print(error_A_array[i]);
+                }
+            }
+
+            System.out.println();
+
+            for (int i = 0; i < obs.length / IT_INCREMENT; i++) {
+                if (i < obs.length / IT_INCREMENT - 1) {
+                    System.out.print(error_B_array[i] + ", ");
+                } else {
+                    System.out.print(error_B_array[i]);
+                }
+            }
+
+            System.out.println();
+
+            for (int i = 0; i < obs.length / IT_INCREMENT; i++) {
+                if (i < obs.length / IT_INCREMENT - 1) {
+                    System.out.print(error_pi_array[i] + ", ");
+                } else {
+                    System.out.print(error_pi_array[i]);
+                }
+            }
+
+            System.out.println();
+
+        }
 
         // System.out.println("error_A: " + error_A);
         // System.out.println("error_B: " + error_B);
