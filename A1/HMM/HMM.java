@@ -27,6 +27,15 @@ public class HMM {
         emissions = B[0].length;
     }
 
+    // Starts h,, with random values
+    public static void randomInit(int st, int emi) {
+        A = matrixOps.randomMatrix(states, states, true);
+        B = matrixOps.randomMatrix(states, emissions, true);
+        pi = matrixOps.randomMatrix(1, states, false);
+        states = st;
+        emissions = emi;
+    }
+
     // Reads values from console and populates A, B, pi
     public static void print_hmm() {
         System.out.println("A:");
@@ -249,5 +258,33 @@ public class HMM {
             iterations++;
         }
         // System.out.println(iterations);
+    }
+
+    // Does baum-welch and returns iterations and final log(prob) to build graphs
+    public static Pair<Double, Double> baumWelchWithDetails(int[] observations) {
+        int iterations = 0;
+        double log_prob_ant = - (LOG_NON_IMPROVEMENT + 1);
+        double log_prob = 0;
+
+        while (iterations < ITERATION_LIMIT && log_prob - log_prob_ant >= LOG_NON_IMPROVEMENT) {
+            log_prob_ant = log_prob;
+            updateHMM(observations);
+
+            Pair<double[][], double[]> alpha_info = fwdAlgorithm(observations);
+            double[] norm_ctes = alpha_info.second;
+
+            log_prob = 0;
+            for (int i = 0; i < norm_ctes.length; i++) {
+                log_prob -= Math.log(norm_ctes[i]);
+            }
+
+            if (iterations == 0)
+                log_prob_ant = log_prob - (LOG_NON_IMPROVEMENT + 1);
+            iterations++;
+        }
+        Pair<Double, Double> summary = new Pair<Double, Double>();
+        summary.first = log_prob;
+        summary.second = iterations;
+        return summary;
     }
 }

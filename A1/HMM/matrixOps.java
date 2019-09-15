@@ -160,13 +160,57 @@ public class matrixOps {
         return norm;
     }
 
+    public static double forbDistance(double[][] A, double[][] B) {
+        int rows = A.length;
+        int cols = A[0].length;
+        double[][] solution = new double[rows][cols];
+        for (int i = 0; i < rows; ++i)
+            for (int j = 0; j < cols; ++j)
+                solution[i][j] = Math.abs(A[i][j] - B[i][j]);
+        return normFrob(solution);
+    }
 
-    // BASIC ARITHMETIC
-    // Returns the ssave multiplication of two doubles
-    private static double safe_mult(double a, double b) {
-        if (a == 0 || b == 0)
-            return 0;
-        double log_sum = Math.log(a) + Math.log(b);
-        return Math.exp(log_sum);
+    // Returns average of matrices
+    public static double absDistance(double[][] A, double[][] B) {
+        int rows = A.length;
+        int cols = A[0].length;
+        // double[][] solution = new double[rows][cols];
+        double dist = 0;
+        for (int i = 0; i < rows; ++i)
+            for (int j = 0; j < cols; ++j)
+                dist += Math.abs(A[i][j] - B[i][j]);
+        return dist;
+    }
+
+    // Returns random array that adds up to 1
+    public static  double[] randomArray(int length, int enhance) {
+        double[] vector = new double[length];
+        // Generate random values
+        double sum = 0;
+        for (int i = 0; i < length; i++) {
+            vector[i] = Math.random();            
+            if (i == enhance) // Makes diagonal elements higher to avoid bad conditioning
+                vector[i] = 4*Math.random();
+            sum += vector[i];
+        }
+        // Divide each element by sum
+        for (int i = 0; i < length; i++) {
+            vector[i] = vector[i]/sum;
+        }
+        return vector;
+    }
+
+    // Returns a random matrix where rows add up to 1
+    public static double[][] randomMatrix(int size_x, int size_y, Boolean enhance) {
+        double[][] matrix = new double[size_x][size_y];
+        for (int i = 0; i < size_x; i++) {
+            double[] row_values;
+            if (enhance) row_values = randomArray(size_y, i);
+            else row_values = randomArray(size_y, -1);
+            for (int j = 0; j < size_y; j++) {
+                matrix[i][j] = row_values[j];
+            }
+        }
+        return matrix;
     }
 }
