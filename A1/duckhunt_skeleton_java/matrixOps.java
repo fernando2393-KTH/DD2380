@@ -161,11 +161,6 @@ public class matrixOps {
         return norm;
     }
 
-    // Returns distance between 2 matrices
-    // public static double distance(double[][] A, double[][] B) {
-    //     return normFrob(substract(A, B)); // COuld be optimized (no need to compute sqrt)
-    // }
-
     // Returns average of matrices
     public static double distance(double[][] A, double[][] B) {
         int rows = A.length;

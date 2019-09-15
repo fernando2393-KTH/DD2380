@@ -13,6 +13,7 @@ class speciesGuesser {
 
     }
 
+    // Creates grouppings and finds quintessentials for each group
     private void firstGroupping(BirdModel[] bird_models) {
         int birds = bird_models.length;
         int group = 0;
@@ -35,7 +36,7 @@ class speciesGuesser {
             double[][][] B = new double[0][bird_models[0].states][bird_models[0].emissions];
             double[][][] pi = new double[0][1][bird_models[0].states];
             for (int j = 0; j < birds; j++) {
-                trials[i][j] = false;
+                trials[i][j] = false; // Mark we havent atempted to guess any
                 if (bird_models[j].groupID == i) {
                     A = matrixOPs.pushMat(A, bird_models[j].A);
                     B = matrixOPs.pushMat(B, bird_models[j].B);
@@ -46,7 +47,6 @@ class speciesGuesser {
             quintessentials[i].B = matrixOPs.average(B);
             quintessentials[i].pi = matrixOPs.average(pi);
         }
-
     }
 
     // 1 in (i, j) means they are equal, 0 they are totally different
@@ -101,7 +101,7 @@ class speciesGuesser {
         }
     }
 
-    // Returns group of new birdModel, creates one if doesn match any
+    // Assigns group of new birdModel, creates one if doesn match any
     public void groupNew(BirdModel bird_model) {
         for (int i = 0; i < quintessentials.length; i++) {
             if (bird_model.difference(quintessentials[i]) < MIN_RELATABLE) {
