@@ -3,7 +3,7 @@ class Player {
     private int timestep;
     private BirdManager bird_manager;
 
-    public static final int START_SHOOTING = 60;
+    public static final int START_SHOOTING = 75;
 
     public Player() {
         timestep = 0;
@@ -29,16 +29,18 @@ class Player {
         bird_manager.updateBirdObss(pState);
 
 
-        if (timestep < 50)
+        if (timestep < START_SHOOTING)
             return cDontShoot;
 
-        Pair<Integer, Integer> shot_info = bird_manager.bestShoot(pState);
-        System.err.print("t: ");
-        System.err.print(timestep);
-        System.err.print(" | ");
-        System.err.print(shot_info.first);
-        System.err.print(": ");
-        System.err.println(shot_info.second);
+        Pair<Integer, Integer> shot_info = bird_manager.bestShoot(pState, timestep);
+        // System.err.print("t: ");
+        // System.err.print(timestep);
+        // System.err.print(" | ");
+        // System.err.print(shot_info.first);
+        // System.err.print(": ");
+        // System.err.println(shot_info.second);
+        // System.err.print(", points: ");
+        // System.err.println(pState.myScore());
         if (shot_info.first == -1)
             return cDontShoot;
         return new Action(shot_info.first, shot_info.second);
@@ -51,8 +53,13 @@ class Player {
     }
 
     public int[] guess(GameState pState, Deadline pDue) {
-        System.err.println("guessing");
-        System.exit(0);
+        System.err.println("--------------------guessing: " + timestep);
+        // speciesGuesser species_guesser = new speciesGuesser();
+        // species_guesser.computeSimilarityMatrix(bird_manager.bird_models);
+        // matrixOps.print_matrix(species_guesser.similarities);
+
+        endRound();
+        // System.exit(0);
 
         int[] lGuess = new int[pState.getNumBirds()];
         for (int i = 0; i < pState.getNumBirds(); ++i)
@@ -69,7 +76,7 @@ class Player {
      * @param pDue   time before which we must have returned
      */
     public void hit(GameState pState, int pBird, Deadline pDue) {
-        System.err.println("HIT BIRD!!!");
+        // System.err.println("HIT BIRD!!!");
     }
 
     /**

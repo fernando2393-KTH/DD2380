@@ -74,7 +74,8 @@ public class HMM {
                 alpha[i][t] = alpha[i][t] * B[i][observations[t]];
                 norm_ctes[t] += alpha[i][t];
             }
-            norm_ctes[t] = 1 / norm_ctes[t];
+            
+            norm_ctes[t] = 1 / (norm_ctes[t]);
             for (int i = 0; i < states; i++) {
                 alpha[i][t] = alpha[i][t] * norm_ctes[t];
             }
@@ -237,8 +238,37 @@ public class HMM {
 
             log_prob = 0;
             for (int i = 0; i < norm_ctes.length; i++) {
-                log_prob -= Math.log(norm_ctes[i]);
+                if (norm_ctes[i] != 0)  // To avoid -infinity in logarith
+                    log_prob -= Math.log(norm_ctes[i]);
             }
+
+            if (iterations == 0)
+                log_prob_ant = log_prob - (LOG_NON_IMPROVEMENT + 1);
+            iterations++;
+        }
+        return log_prob;
+    }
+
+    public double baumWelchDebug(int[] observations) {
+        int iterations = 0;
+        double log_prob_ant = - (LOG_NON_IMPROVEMENT + 1);
+        double log_prob = 0;
+
+        while (iterations < ITERATION_LIMIT && log_prob - log_prob_ant >= LOG_NON_IMPROVEMENT) {
+            log_prob_ant = log_prob;
+            updateHMM(observations);
+
+            Pair<double[][], double[]> alpha_info = fwdAlgorithm(observations);
+            double[] norm_ctes = alpha_info.second;
+
+            log_prob = 0;
+            for (int i = 0; i < norm_ctes.length; i++) {
+            System.err.print(", ");
+            System.err.print(norm_ctes[i]);
+                if (norm_ctes[i] != 0 && norm_ctes[i] != Double.POSITIVE_INFINITY)  // To avoid -infinity in logarith
+                    log_prob -= Math.log(norm_ctes[i]);
+            }
+            // System.err.println(log_prob);
 
             if (iterations == 0)
                 log_prob_ant = log_prob - (LOG_NON_IMPROVEMENT + 1);
@@ -248,8 +278,9 @@ public class HMM {
             // System.err.println("----");
             iterations++;
         }
-        // System.err.println("iterations");
-        // System.err.println(iterations);
+        System.err.println();
+        System.err.print("iterations: ");
+        System.err.println(iterations);
         return log_prob;
     }
 }

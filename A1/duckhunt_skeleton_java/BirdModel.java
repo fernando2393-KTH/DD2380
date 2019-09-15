@@ -1,15 +1,16 @@
 import java.util.Arrays;
 
 public class BirdModel extends HMM {
+    public int groupID = -1;  // Grouped by similitude
     public int[] observations = new int[0];  // Array of seen observations until now
     public double confidence;  // Confidence of the model
     // OBS: confidence is negative and the highest, the better: log(prob)
 
     // Class constructor (randomly initializes A, B, pi)
     public BirdModel(int states, int emissions) {
-        super.A = matrixOps.randomMatrix(states, states);
-        super.B = matrixOps.randomMatrix(states, emissions);
-        super.pi = matrixOps.randomMatrix(1, states);
+        super.A = matrixOps.randomMatrix(states, states, true);
+        super.B = matrixOps.randomMatrix(states, emissions, true);
+        super.pi = matrixOps.randomMatrix(1, states, false);
         super.states = states;
         super.emissions = emissions;
     }
@@ -24,6 +25,10 @@ public class BirdModel extends HMM {
         confidence = super.baumWelch(observations);
     }
 
+    public void updateModelDebug() {
+        confidence = super.baumWelchDebug(observations);
+    }
+    
     // Predicts bird's next movement
     public int predictMovement() {
         int T = observations.length;
@@ -61,5 +66,15 @@ public class BirdModel extends HMM {
         System.err.println("Conf:");
         System.err.println(confidence);
         System.err.println("############");
+    }
+
+    // Given another BirdModel returns the difference among them
+    public double difference(BirdModel bird) {
+        double dif = 0;
+        dif += matrixOps.distance(super.A, bird.A);
+        dif += matrixOps.distance(super.B, bird.B);
+        // dif += matrixOps.distance(super.pi, bird.pi);
+        // return dif/3;
+        return dif/2;
     }
 }

@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class matrixOps {
     // IO
     // Read matrix from console
-    public double[][] read_matrix(BufferedReader reader) {        
+    public static double[][] read_matrix(BufferedReader reader) {        
         String encoded_matrix;
         try {
             encoded_matrix = reader.readLine();
@@ -26,7 +26,7 @@ public class matrixOps {
         return matrix;
     }
 
-    public int[] read_vector(BufferedReader reader) {
+    public static int[] read_vector(BufferedReader reader) {
         String encoded_matrix;
         try {
             encoded_matrix = reader.readLine();
@@ -44,7 +44,7 @@ public class matrixOps {
     }
     
     // Given a console line, returns the encoded matrix
-    public void print_matrix(double[][] mat) {
+    public static void print_matrix(double[][] mat) {
         System.err.print(mat.length);  // Print rows
         System.err.print(" ");
         System.err.print(mat[0].length);  // Print cols
@@ -61,7 +61,7 @@ public class matrixOps {
     }
 
     // Given a console line, returns the encoded matrix
-    public void print_vector(double[] mat) {
+    public static void print_vector(double[] mat) {
         System.err.print(mat.length);  // Print rows
         System.err.print(": ");
         System.err.println();  // Print cols
@@ -74,7 +74,7 @@ public class matrixOps {
     }
 
     // Given a console line, returns the encoded matrix
-    public void print_matrix_as_row(double[][] mat) {
+    public static void print_matrix_as_row(double[][] mat) {
         System.err.print(mat.length);  // Print rows
         System.err.print(" ");
         System.err.print(mat[0].length);  // Print cols
@@ -89,7 +89,7 @@ public class matrixOps {
 
     // ARITHMETIC
     // returns mat_a*mat_b
-    public double[][] multiply(double[][] mat_a, double[][] mat_b) {
+    public static double[][] multiply(double[][] mat_a, double[][] mat_b) {
         int rows_a = mat_a.length;
         int cols_a = mat_a[0].length;
         int rows_b = mat_b.length;
@@ -109,7 +109,7 @@ public class matrixOps {
 
     // given a vector, a matrix and  a col_id, returns vector of element-wise
     // multiplication of vector values and given column (useful at forward alg)
-    public double[][] vector_col_elem_wise_mult(double[][] vect, double[][] mat, int col) {
+    public static double[][] vector_col_elem_wise_mult(double[][] vect, double[][] mat, int col) {
         int rows_mat = mat.length;
         int cols_vect = vect[0].length;
         if (cols_vect != rows_mat)
@@ -120,7 +120,7 @@ public class matrixOps {
         return result;
     }
 
-    public Pair<Double, Integer> maxVectorMatrixCol(double [][] vector, double [][] matrix, int col){
+    public static Pair<Double, Integer> maxVectorMatrixCol(double [][] vector, double [][] matrix, int col){
 
         int rows_mat = matrix.length;
         int cols_vect = vector[0].length;
@@ -149,7 +149,7 @@ public class matrixOps {
 
     }
 
-    public double normFrob(double[][] matrix) {
+    public static double normFrob(double[][] matrix) {
         double norm = 0.0;
         int rows = matrix.length;
         int cols = matrix[0].length;
@@ -161,21 +161,59 @@ public class matrixOps {
         return norm;
     }
 
+    // Returns distance between 2 matrices
+    // public static double distance(double[][] A, double[][] B) {
+    //     return normFrob(substract(A, B)); // COuld be optimized (no need to compute sqrt)
+    // }
+
+    // Returns average of matrices
+    public static double distance(double[][] A, double[][] B) {
+        int rows = A.length;
+        int cols = A[0].length;
+        // double[][] solution = new double[rows][cols];
+        double dist = 0;
+        for (int i = 0; i < rows; ++i)
+            for (int j = 0; j < cols; ++j)
+                dist += Math.abs(A[i][j] - B[i][j]);
+        return dist;
+    }
+
+    // Returns average of matrices
+    public static double[][] average(double[][][] matrices) {
+        int matrices_num = matrices.length;
+        int rows = matrices[0].length;
+        int cols = matrices[0][0].length;
+        double[][] solution = new double[rows][cols];
+        for (int k = 0; k < matrices_num; k++)
+            for (int i = 0; i < rows; ++i)
+                for (int j = 0; j < cols; ++j)
+                    solution[i][j] += matrices[k][i][j]/matrices_num;
+        return solution;
+    }
+
     
     // OTHER
-    public int[] push(int[] arr, int item) {
+    public static int[] push(int[] arr, int item) {
+        int[] tmp = Arrays.copyOf(arr, arr.length + 1);
+        tmp[tmp.length - 1] = item;
+        return tmp;
+    }
+
+    public static double[][][] pushMat(double[][][] arr, double[][] mat) {
         int[] tmp = Arrays.copyOf(arr, arr.length + 1);
         tmp[tmp.length - 1] = item;
         return tmp;
     }
 
     // Returns random array that adds up to 1
-    public  double[] randomArray(int length) {
+    public static  double[] randomArray(int length, int enhance) {
         double[] vector = new double[length];
         // Generate random values
         double sum = 0;
         for (int i = 0; i < length; i++) {
-            vector[i] = Math.random();
+            vector[i] = Math.random();            
+            if (i == enhance) // Makes diagonal elements higher to avoid bad conditioning
+                vector[i] = 4*Math.random();
             sum += vector[i];
         }
         // Divide each element by sum
@@ -186,10 +224,12 @@ public class matrixOps {
     }
 
     // Returns a random matrix where rows add up to 1
-    public double[][] randomMatrix(int size_x, int size_y) {
+    public static double[][] randomMatrix(int size_x, int size_y, Boolean enhance) {
         double[][] matrix = new double[size_x][size_y];
         for (int i = 0; i < size_x; i++) {
-            double[] row_values = randomArray(size_y);
+            double[] row_values;
+            if (enhance) row_values = randomArray(size_y, i);
+            else row_values = randomArray(size_y, -1);
             for (int j = 0; j < size_y; j++) {
                 matrix[i][j] = row_values[j];
             }
