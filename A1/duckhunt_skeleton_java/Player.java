@@ -2,12 +2,14 @@ class Player {
     public static final Action cDontShoot = new Action(-1, -1);
     private int timestep;
     private BirdManager bird_manager;
+    private BirdGuesser bird_guesser;
 
-    public static final int START_SHOOTING = 75;
+    public static final int START_SHOOTING = 100;
 
     public Player() {
         timestep = 0;
-        bird_manager = new BirdManager(5, 9);
+        bird_manager = new BirdManager(3, 9);
+        bird_guesser = new BirdGuesser(3, 9);
     }
 
     // Methods to run once the round is finished
@@ -27,7 +29,6 @@ class Player {
         timestep += pState.getNumNewTurns(); // Update timestep count
 
         bird_manager.updateBirdObss(pState);
-
 
         if (timestep < START_SHOOTING)
             return cDontShoot;
@@ -54,17 +55,15 @@ class Player {
 
     public int[] guess(GameState pState, Deadline pDue) {
         System.err.println("--------------------guessing: " + timestep);
-        // speciesGuesser species_guesser = new speciesGuesser();
-        // species_guesser.computeSimilarityMatrix(bird_manager.bird_models);
-        // matrixOps.print_matrix(species_guesser.similarities);
+        // speciesGuesser bird_guesser = new speciesGuesser();
+        // bird_guesser.computeSimilarityMatrix(bird_manager.bird_models);
+        // matrixOps.print_matrix(bird_guesser.similarities);
+        bird_manager.updateBirdModels();
+        int[] guesses = new int[pState.getNumBirds()];
+        guesses = bird_guesser.getGuesses(bird_manager.bird_models);
+        // bird_guesser.printGrouping(bird_manager.bird_models, guesses);
 
-        endRound();
-        // System.exit(0);
-
-        int[] lGuess = new int[pState.getNumBirds()];
-        for (int i = 0; i < pState.getNumBirds(); ++i)
-            lGuess[i] = Constants.SPECIES_UNKNOWN;
-        return lGuess;
+        return guesses;
     }
 
     /**
@@ -88,6 +87,16 @@ class Player {
      * @param pDue     time before which we must have returned
      */
     public void reveal(GameState pState, int[] pSpecies, Deadline pDue) {
+        System.err.println("--------------------revealing: ");
+        bird_guesser.manageRevelations(bird_manager.bird_models, pSpecies);
+        // bird_guesser.printGrouping(bird_manager.bird_models, pSpecies);
+
+        // System.err.print("###### PUNCTUATION: ");
+        // System.err.println(pState.myScore());
+        endRound();
+
+        // if (pState.getRound() == 1)
+        //     System.exit(0);
     }
 
 }

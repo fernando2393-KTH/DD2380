@@ -186,8 +186,25 @@ public class matrixOps {
         return solution;
     }
 
+    public static double[][] average2(double[][] A, double[][] B) {
+        int matrices_num = 2;
+        int rows = A.length;
+        int cols = A[0].length;
+        double[][] solution = new double[rows][cols];
+        for (int i = 0; i < rows; ++i)
+            for (int j = 0; j < cols; ++j)
+                solution[i][j] = (A[i][j] + B[i][j])/matrices_num;
+        return solution;
+    }
+
     
     // OTHER
+    // public static int[] push(int[] arr, int item) {
+    //     int[] tmp = Arrays.copyOf(arr, arr.length + 1);
+    //     tmp[tmp.length - 1] = item;
+    //     return tmp;
+    // }
+
     public static int[] push(int[] arr, int item) {
         int[] tmp = Arrays.copyOf(arr, arr.length + 1);
         tmp[tmp.length - 1] = item;
@@ -195,8 +212,8 @@ public class matrixOps {
     }
 
     public static double[][][] pushMat(double[][][] arr, double[][] mat) {
-        int[] tmp = Arrays.copyOf(arr, arr.length + 1);
-        tmp[tmp.length - 1] = item;
+        double[][][] tmp = Arrays.copyOf(arr, arr.length + 1);
+        tmp[tmp.length - 1] = mat;
         return tmp;
     }
 

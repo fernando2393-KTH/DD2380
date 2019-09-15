@@ -37,6 +37,11 @@ public class BirdManager {
         }
     }
 
+    public void updateBirdModels() {
+        for (int i = 0; i < bird_models.length; i++)
+            bird_models[i].updateModel();
+    }
+
     // Returns par: bird to shoot nad next expected move
     public Pair<Integer, Integer> bestShoot(GameState pState, int timestep) {
         double max = Double.NEGATIVE_INFINITY;
