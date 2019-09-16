@@ -9,7 +9,7 @@ public class HMMc {
     private static double[][] B_real = { { 0.7, 0.2, 0.1, 0 }, { 0.1, 0.4, 0.3, 0.2 }, { 0, 0.1, 0.2, 0.7 } };
     private static double[][] pi_real = { { 1, 0, 0 } };
 
-    private static final int IT_INCREMENT = 5;
+    private static final int IT_INCREMENT = 10;
     private static final boolean DEBUG = true;
 
     public static void main(String[] args) {
@@ -22,6 +22,11 @@ public class HMMc {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         hmm.read_hmm(reader);
+
+        // int states = 4;
+        // int emissions = 4;
+        // hmm.randomInit(states, emissions);
+        hmm.print_hmm();
 
         // Aux variables for hmm reset
         double A_aux [][] = new double [hmm.A.length][hmm.A[0].length];
@@ -43,12 +48,12 @@ public class HMMc {
 
 
         // Reads the first three lines for question 8, since matrix is initialized in other way
-        /*try {
-            reader.readLine();
-            reader.readLine();
-            reader.readLine();
-        } catch (Exception e) {
-        }*/
+        // try {
+        //     reader.readLine();
+        //     reader.readLine();
+        //     reader.readLine();
+        // } catch (Exception e) {
+        // }
 
         
         int[] obs = matrixOps.read_vector(reader);
@@ -62,7 +67,7 @@ public class HMMc {
         //double error_pi_array[] = new double[obs.length / IT_INCREMENT];
         double error_matrices[] = new double[obs.length / IT_INCREMENT];
 
-        for (int i = 5; i < obs.length + 1; i = i + IT_INCREMENT) { // Increment of 10 observations per iteration
+        for (int i = 10; i < obs.length + 1; i = i + IT_INCREMENT) { // Increment of 10 observations per iteration
             
             int[] obs_subarray = Arrays.copyOfRange(obs, 0, i);
 
@@ -90,7 +95,7 @@ public class HMMc {
 
         if (DEBUG) {
 
-            /*for (int i = 0; i < obs.length / IT_INCREMENT; i++) {
+            for (int i = 0; i < obs.length / IT_INCREMENT; i++) {
                 if (i < obs.length / IT_INCREMENT - 1) {
                     System.out.print(last_log_prob_array[i] + ", ");
                 } else {
@@ -110,7 +115,7 @@ public class HMMc {
 
             System.out.println();
 
-            for (int i = 0; i < obs.length / IT_INCREMENT; i++) {
+            /*for (int i = 0; i < obs.length / IT_INCREMENT; i++) {
                 if (i < obs.length / IT_INCREMENT - 1) {
                     System.out.print(error_A_array[i] + ", ");
                 } else {
@@ -148,7 +153,7 @@ public class HMMc {
                 }
             }
 
-            // System.out.println();
+            System.out.println();
 
         }
 
