@@ -51,7 +51,7 @@ class BirdGroup extends BirdModel {
         if (bird.species != -1 && species != -1 && bird.species != species) {
             System.err.println("Wrong bird in this group");
         }
-        // bird.groupID = groupID;
+        bird.groupID = groupID;
         
         if (!birds_grouped.contains(bird))
             birds_grouped.add(bird);

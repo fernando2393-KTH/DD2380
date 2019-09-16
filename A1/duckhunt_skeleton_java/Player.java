@@ -60,8 +60,11 @@ class Player {
         // bird_guesser.computeSimilarityMatrix(bird_manager.bird_models);
         // matrixOps.print_matrix(bird_guesser.similarities);
         bird_manager.updateBirdModels();
+        // System.err.println(pDue.remainingMs());
         sent_guesses = new int[pState.getNumBirds()];
         sent_guesses = bird_guesser.getGuesses(bird_manager.bird_models);
+        // System.err.println(pDue.remainingMs());
+
         // bird_guesser.printGrouping(bird_manager.bird_models, guesses);
 
         return sent_guesses;
@@ -76,7 +79,7 @@ class Player {
      * @param pDue   time before which we must have returned
      */
     public void hit(GameState pState, int pBird, Deadline pDue) {
-        // System.err.println("HIT BIRD!!!");
+        System.err.println("HIT BIRD!!!");
     }
 
     private void guessing_statistics(int[] real_vals) {
@@ -99,6 +102,11 @@ class Player {
         System.err.println(unknown);
     }
 
+    private void print_remaining(Deadline pDue) {
+        System.err.print("MS Left:");
+        System.err.println(pDue.remainingMs());
+    }
+
     /**
      * If you made any guesses, you will find out the true species of those birds
      * through this function.
@@ -109,8 +117,10 @@ class Player {
      */
     public void reveal(GameState pState, int[] pSpecies, Deadline pDue) {
         // System.err.println("--------------------revealing: ");
+
         bird_guesser.manageRevelations(bird_manager.bird_models, pSpecies);
         // bird_guesser.printGrouping(bird_manager.bird_models, pSpecies);
+
         guessing_statistics(pSpecies);
 
         // System.err.print("###### PUNCTUATION: ");
