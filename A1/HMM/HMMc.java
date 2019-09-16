@@ -9,7 +9,7 @@ public class HMMc {
     private static double[][] B_real = { { 0.7, 0.2, 0.1, 0 }, { 0.1, 0.4, 0.3, 0.2 }, { 0, 0.1, 0.2, 0.7 } };
     private static double[][] pi_real = { { 1, 0, 0 } };
 
-    private static final int IT_INCREMENT = 10;
+    private static final int IT_INCREMENT = 5;
     private static final boolean DEBUG = true;
 
     public static void main(String[] args) {
@@ -22,6 +22,15 @@ public class HMMc {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         hmm.read_hmm(reader);
+
+        // Aux variables for hmm reset
+        double A_aux [][] = new double [hmm.A.length][hmm.A[0].length];
+        double B_aux [][] = new double [hmm.B.length][hmm.B[0].length];
+        double pi_aux [][] = new double [hmm.pi.length][hmm.pi[0].length];
+
+        matrixOps.copy_matrix(hmm.A, A_aux);
+        matrixOps.copy_matrix(hmm.B, B_aux);
+        matrixOps.copy_matrix(hmm.pi, pi_aux);
         
         // int states = 3;
         // int emissions = 4;
@@ -29,8 +38,8 @@ public class HMMc {
         // changing states param)
 
         //HMM.randomInit(4, 4);
-        hmm_original.print_hmm();
-        hmm.print_hmm(); // Printing the randomly generated matrix
+        //hmm_original.print_hmm();
+        //hmm.print_hmm(); // Printing the randomly generated matrix
 
 
         // Reads the first three lines for question 8, since matrix is initialized in other way
@@ -53,10 +62,10 @@ public class HMMc {
         //double error_pi_array[] = new double[obs.length / IT_INCREMENT];
         double error_matrices[] = new double[obs.length / IT_INCREMENT];
 
-        for (int i = 10; i < obs.length + 1; i = i + IT_INCREMENT) { // Increment of 10 observations per iteration
+        for (int i = 5; i < obs.length + 1; i = i + IT_INCREMENT) { // Increment of 10 observations per iteration
+            
             int[] obs_subarray = Arrays.copyOfRange(obs, 0, i);
 
-            // TODO(Fernando) : reset hmm every time
             Pair<Double, Integer> nw_details = hmm.baumWelchWithDetails(obs_subarray);
             Double estimated_log_prob = hmm.obsLogProb(obs_subarray);
             Double original_log_prob = hmm_original.obsLogProb(obs_subarray);
@@ -66,6 +75,11 @@ public class HMMc {
             last_log_prob_array[i / IT_INCREMENT - 1] = estimated_log_prob;
             iterations_array[i / IT_INCREMENT - 1] = nw_details.second;
             error_matrices[i / IT_INCREMENT - 1] = Math.abs(estimated_log_prob - original_log_prob); // Calculation of the difference of probabilities
+
+            // hmm reset            
+            matrixOps.copy_matrix(A_aux, hmm.A);
+            matrixOps.copy_matrix(B_aux, hmm.B);
+            matrixOps.copy_matrix(pi_aux, hmm.pi);
         }
 
         try {

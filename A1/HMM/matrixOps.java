@@ -86,6 +86,15 @@ public class matrixOps {
         System.out.println();    
     }
 
+    // Given a matrix, copies it into another one
+    public static void copy_matrix(double [][] o, double[][] d){
+        for(int i = 0; i < o.length; i++){
+            for(int j = 0; j < o[0].length; j++){
+                d[i][j] = o[i][j];
+            }
+        }
+    }
+
     // ARITHMETIC
     // returns mat_a*mat_b
     public static double[][] multiply(double[][] mat_a, double[][] mat_b) {
