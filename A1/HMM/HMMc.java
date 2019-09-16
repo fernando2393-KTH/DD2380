@@ -2,16 +2,42 @@
 // Solution of HMM1 problem
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.Object;
+import java.util.Arrays;
 
 public class HMMc {
+    private static double[][] A_real = { { 0.7, 0.05, 0.25 }, { 0.1, 0.8, 0.1 }, { 0.2, 0.3, 0.5 } };
+    private static double[][] B_real = { { 0.7, 0.2, 0.1, 0 }, { 0.1, 0.4, 0.3, 0.2 }, { 0, 0.1, 0.2, 0.7 } };
+    private static double[][] pi_real = { { 1, 0, 0 } };
+
+    private static final int IT_INCREMENT = 10;
+    private static final boolean DEBUG = true;
+
     public static void main(String[] args) {
         // Reader to read from terminal
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         HMM.read_hmm(reader);
+        
+        // int states = 3;
+        // int emissions = 4;
+        // HMM.randomInit(states, emissions) // OBS: Question 9 is the same just
+        // changing states param)
 
-        int [] obs = matrixOps.read_vector(reader);
+        //HMM.randomInit(4, 4);
+
+        HMM.print_hmm(); // Printing the randomly generated matrix
+
+
+        // Reads the first three lines for question 8, since matrix is initialized in other way
+        /*try {
+            reader.readLine();
+            reader.readLine();
+            reader.readLine();
+        } catch (Exception e) {
+        }*/
+
+        
+        int[] obs = matrixOps.read_vector(reader);
 
         try {
             reader.close();
@@ -19,42 +45,84 @@ public class HMMc {
             System.err.println(e);
         }
 
-        HMM.baumWelch(obs);
-        //HMM.print_hmm();
-        matrixOps.print_matrix(HMM.A);
-        matrixOps.print_matrix(HMM.B);
-        matrixOps.print_matrix(HMM.pi);
+        double last_log_prob_array[] = new double[obs.length / IT_INCREMENT];
+        double iterations_array[] = new double[obs.length / IT_INCREMENT];
+        double error_A_array[] = new double[obs.length / IT_INCREMENT];
+        double error_B_array[] = new double[obs.length / IT_INCREMENT];
+        double error_pi_array[] = new double[obs.length / IT_INCREMENT];
 
+        for (int i = 10; i < obs.length + 1; i = i + IT_INCREMENT) { // Increment of 10 observations per iteration
 
-        double[][] A_real = {{0.7, 0.05, 0.25}, {0.1, 0.8, 0.1}, {0.2, 0.3, 0.5}};
-        double[][] B_real = {{0.7, 0.2, 0.1, 0}, {0.1, 0.4, 0.3, 0.2}, {0, 0.1, 0.2, 0.7}};
-        double[][] pi_real = {{1, 0, 0}};
-        double error_A = Math.abs(matrixOps.normFrob(HMM.A) - matrixOps.normFrob(A_real));
-        double error_B = Math.abs(matrixOps.normFrob(HMM.B) - matrixOps.normFrob(B_real));
-        double error_pi = Math.abs(matrixOps.normFrob(HMM.pi) - matrixOps.normFrob(pi_real));
-        
-        if(error_A < 0.01){
-            System.out.print("error_A: " + error_A);
-            System.out.println(" CONVERGES!");
+            Pair<Double, Integer> nw_details = HMM.baumWelchWithDetails(Arrays.copyOfRange(obs, 0, i)); // Increment
+                                                                                                        // number of
+                                                                                                        // observations
+                                                                                                        // per iteration
+            last_log_prob_array[i / IT_INCREMENT - 1] = nw_details.first;
+            iterations_array[i / IT_INCREMENT - 1] = nw_details.second;
+            error_A_array[i / IT_INCREMENT - 1] = matrixOps.forbDistance(HMM.A, A_real);
+            error_B_array[i / IT_INCREMENT - 1] = matrixOps.forbDistance(HMM.B, B_real);
+            error_pi_array[i / IT_INCREMENT - 1] = matrixOps.forbDistance(HMM.pi, pi_real);
+
         }
-        else {
-            System.out.println("error_A: " + error_A);
+
+        if (DEBUG) {
+
+            for (int i = 0; i < obs.length / IT_INCREMENT; i++) {
+                if (i < obs.length / IT_INCREMENT - 1) {
+                    System.out.print(last_log_prob_array[i] + ", ");
+                } else {
+                    System.out.print(last_log_prob_array[i]);
+                }
+            }
+
+            System.out.println();
+
+            for (int i = 0; i < obs.length / IT_INCREMENT; i++) {
+                if (i < obs.length / IT_INCREMENT - 1) {
+                    System.out.print(iterations_array[i] + ", ");
+                } else {
+                    System.out.print(iterations_array[i]);
+                }
+            }
+
+            System.out.println();
+
+            for (int i = 0; i < obs.length / IT_INCREMENT; i++) {
+                if (i < obs.length / IT_INCREMENT - 1) {
+                    System.out.print(error_A_array[i] + ", ");
+                } else {
+                    System.out.print(error_A_array[i]);
+                }
+            }
+
+            System.out.println();
+
+            for (int i = 0; i < obs.length / IT_INCREMENT; i++) {
+                if (i < obs.length / IT_INCREMENT - 1) {
+                    System.out.print(error_B_array[i] + ", ");
+                } else {
+                    System.out.print(error_B_array[i]);
+                }
+            }
+
+            System.out.println();
+
+            for (int i = 0; i < obs.length / IT_INCREMENT; i++) {
+                if (i < obs.length / IT_INCREMENT - 1) {
+                    System.out.print(error_pi_array[i] + ", ");
+                } else {
+                    System.out.print(error_pi_array[i]);
+                }
+            }
+
+            System.out.println();
+
         }
-        
-        if(error_B < 0.01){
-            System.out.print("error_B: " + error_B);
-            System.out.println(" CONVERGES!");
-        }
-        else {
-            System.out.println("error_B: " + error_B);
-        }
-        
-        if(error_pi < 0.01){
-            System.out.print("error_pi: " + error_pi);
-            System.out.println(" CONVERGES!");
-        }
-        else {
-            System.out.println("error_pi: " + error_pi);
-        }
+
+        HMM.print_hmm();
+
+        // System.out.println("error_A: " + error_A);
+        // System.out.println("error_B: " + error_B);
+        // System.out.println("error_pi: " + error_pi);
     }
 }

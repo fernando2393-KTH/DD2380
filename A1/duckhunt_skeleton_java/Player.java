@@ -1,54 +1,65 @@
-
 class Player {
+    public static final Action cDontShoot = new Action(-1, -1);
+    private int timestep;
+    private BirdManager bird_manager;
+
+    public static final int START_SHOOTING = 75;
 
     public Player() {
+        timestep = 0;
+        bird_manager = new BirdManager(5, 9);
     }
 
-    /**
-     * Shoot!
-     *
-     * This is the function where you start your work.
-     *
-     * You will receive a variable pState, which contains information about all
-     * birds, both dead and alive. Each bird contains all past moves.
-     *
-     * The state also contains the scores for all players and the number of
-     * time steps elapsed since the last time this function was called.
-     *
-     * @param pState the GameState object with observations etc
-     * @param pDue time before which we must have returned
-     * @return the prediction of a bird we want to shoot at, or cDontShoot to pass
-     */
+    // Methods to run once the round is finished
+    private void startRound(GameState pState) {
+        bird_manager.start_round(pState.getNumBirds());
+    }
+
+    // Methods to run once the round is finished
+    private void endRound() {
+        timestep = 0;
+        bird_manager.finish_round();
+    }
+
     public Action shoot(GameState pState, Deadline pDue) {
-        /*
-         * Here you should write your clever algorithms to get the best action.
-         * This skeleton never shoots.
-         */
+        if (timestep == 0)
+            startRound(pState);
+        timestep += pState.getNumNewTurns(); // Update timestep count
 
-        // This line chooses not to shoot.
-        return cDontShoot;
+        bird_manager.updateBirdObss(pState);
 
-        // This line would predict that bird 0 will move right and shoot at it.
-        // return Action(0, MOVE_RIGHT);
+
+        if (timestep < START_SHOOTING)
+            return cDontShoot;
+
+        Pair<Integer, Integer> shot_info = bird_manager.bestShoot(pState, timestep);
+        // System.err.print("t: ");
+        // System.err.print(timestep);
+        // System.err.print(" | ");
+        // System.err.print(shot_info.first);
+        // System.err.print(": ");
+        // System.err.println(shot_info.second);
+        // System.err.print(", points: ");
+        // System.err.println(pState.myScore());
+        if (shot_info.first == -1)
+            return cDontShoot;
+        return new Action(shot_info.first, shot_info.second);
+
+        // // This line would predict that bird 0 will move right and shoot at it.
+        // int min = 0;
+        // int max = pState.getNumBirds();
+        // int bird = (int)(Math.random() * ((max - min) + 1)) + min;
+        // return new Action(bird, Constants.MOVE_RIGHT);
     }
 
-    /**
-     * Guess the species!
-     * This function will be called at the end of each round, to give you
-     * a chance to identify the species of the birds for extra points.
-     *
-     * Fill the vector with guesses for the all birds.
-     * Use SPECIES_UNKNOWN to avoid guessing.
-     *
-     * @param pState the GameState object with observations etc
-     * @param pDue time before which we must have returned
-     * @return a vector with guesses for all the birds
-     */
     public int[] guess(GameState pState, Deadline pDue) {
-        /*
-         * Here you should write your clever algorithms to guess the species of
-         * each bird. This skeleton makes no guesses, better safe than sorry!
-         */
+        System.err.println("--------------------guessing: " + timestep);
+        // speciesGuesser species_guesser = new speciesGuesser();
+        // species_guesser.computeSimilarityMatrix(bird_manager.bird_models);
+        // matrixOps.print_matrix(species_guesser.similarities);
+
+        endRound();
+        // System.exit(0);
 
         int[] lGuess = new int[pState.getNumBirds()];
         for (int i = 0; i < pState.getNumBirds(); ++i)
@@ -57,27 +68,26 @@ class Player {
     }
 
     /**
-     * If you hit the bird you were trying to shoot, you will be notified
-     * through this function.
+     * If you hit the bird you were trying to shoot, you will be notified through
+     * this function.
      *
      * @param pState the GameState object with observations etc
-     * @param pBird the bird you hit
-     * @param pDue time before which we must have returned
+     * @param pBird  the bird you hit
+     * @param pDue   time before which we must have returned
      */
     public void hit(GameState pState, int pBird, Deadline pDue) {
-        System.err.println("HIT BIRD!!!");
+        // System.err.println("HIT BIRD!!!");
     }
 
     /**
-     * If you made any guesses, you will find out the true species of those
-     * birds through this function.
+     * If you made any guesses, you will find out the true species of those birds
+     * through this function.
      *
-     * @param pState the GameState object with observations etc
+     * @param pState   the GameState object with observations etc
      * @param pSpecies the vector with species
-     * @param pDue time before which we must have returned
+     * @param pDue     time before which we must have returned
      */
     public void reveal(GameState pState, int[] pSpecies, Deadline pDue) {
     }
 
-    public static final Action cDontShoot = new Action(-1, -1);
 }

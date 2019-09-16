@@ -3,6 +3,7 @@ import java.awt.List;
 import java.io.BufferedReader;
 import java.lang.Math;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class matrixOps {
     // IO
@@ -44,46 +45,46 @@ public class matrixOps {
     
     // Given a console line, returns the encoded matrix
     public static void print_matrix(double[][] mat) {
-        System.out.print(mat.length);  // Print rows
-        System.out.print(" ");
-        System.out.print(mat[0].length);  // Print cols
-        System.out.println();  // Print cols
+        System.err.print(mat.length);  // Print rows
+        System.err.print(" ");
+        System.err.print(mat[0].length);  // Print cols
+        System.err.println();  // Print cols
         for (int i = 0; i < mat.length; i++) {
             for (int j = 0; j < mat[0].length; j++) {
-                System.out.print(" ");
-                double roundOff = Math.round(mat[i][j] * 10000.0) / 10000.0;
-                System.out.print(roundOff);
+                System.err.print(" ");
+                double roundOff = Math.round(mat[i][j] * 100.0) / 100.0;
+                System.err.print(roundOff);
             }
-            System.out.println();
-            System.out.println();
+            System.err.println();
+            System.err.println();
         }
     }
 
     // Given a console line, returns the encoded matrix
     public static void print_vector(double[] mat) {
-        System.out.print(mat.length);  // Print rows
-        System.out.print(": ");
-        System.out.println();  // Print cols
+        System.err.print(mat.length);  // Print rows
+        System.err.print(": ");
+        System.err.println();  // Print cols
         for (int i = 0; i < mat.length; i++) {
-                System.out.print(" ");
+                System.err.print(" ");
                 double roundOff = Math.round(mat[i] * 10000.0) / 10000.0;
-                System.out.print(roundOff);
+                System.err.print(roundOff);
             }
-            System.out.println();
+            System.err.println();
     }
 
     // Given a console line, returns the encoded matrix
     public static void print_matrix_as_row(double[][] mat) {
-        System.out.print(mat.length);  // Print rows
-        System.out.print(" ");
-        System.out.print(mat[0].length);  // Print cols
+        System.err.print(mat.length);  // Print rows
+        System.err.print(" ");
+        System.err.print(mat[0].length);  // Print cols
         for (int i = 0; i < mat.length; i++) {
             for (int j = 0; j < mat[0].length; j++) {
-                System.out.print(" ");
-                System.out.print(mat[i][j]);
+                System.err.print(" ");
+                System.err.print(mat[i][j]);
             }
         }
-        System.out.println();    
+        System.err.println();    
     }
 
     // ARITHMETIC
@@ -160,18 +161,8 @@ public class matrixOps {
         return norm;
     }
 
-    public static double forbDistance(double[][] A, double[][] B) {
-        int rows = A.length;
-        int cols = A[0].length;
-        double[][] solution = new double[rows][cols];
-        for (int i = 0; i < rows; ++i)
-            for (int j = 0; j < cols; ++j)
-                solution[i][j] = Math.abs(A[i][j] - B[i][j]);
-        return normFrob(solution);
-    }
-
     // Returns average of matrices
-    public static double absDistance(double[][] A, double[][] B) {
+    public static double distance(double[][] A, double[][] B) {
         int rows = A.length;
         int cols = A[0].length;
         // double[][] solution = new double[rows][cols];
@@ -180,6 +171,33 @@ public class matrixOps {
             for (int j = 0; j < cols; ++j)
                 dist += Math.abs(A[i][j] - B[i][j]);
         return dist;
+    }
+
+    // Returns average of matrices
+    public static double[][] average(double[][][] matrices) {
+        int matrices_num = matrices.length;
+        int rows = matrices[0].length;
+        int cols = matrices[0][0].length;
+        double[][] solution = new double[rows][cols];
+        for (int k = 0; k < matrices_num; k++)
+            for (int i = 0; i < rows; ++i)
+                for (int j = 0; j < cols; ++j)
+                    solution[i][j] += matrices[k][i][j]/matrices_num;
+        return solution;
+    }
+
+    
+    // OTHER
+    public static int[] push(int[] arr, int item) {
+        int[] tmp = Arrays.copyOf(arr, arr.length + 1);
+        tmp[tmp.length - 1] = item;
+        return tmp;
+    }
+
+    public static double[][][] pushMat(double[][][] arr, double[][] mat) {
+        int[] tmp = Arrays.copyOf(arr, arr.length + 1);
+        tmp[tmp.length - 1] = item;
+        return tmp;
     }
 
     // Returns random array that adds up to 1

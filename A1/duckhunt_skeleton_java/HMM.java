@@ -9,17 +9,17 @@ import java.lang.Math;
 
 public class HMM {
     // PUBLIC
-    static double[][] A;
-    static double[][] B;
-    static double[][] pi;
-    static int states;
-    static int emissions;
+    double[][] A;
+    double[][] B;
+    double[][] pi;
+    int states;
+    int emissions;
 
-    public static final int ITERATION_LIMIT = 1000;
-    public static final double LOG_NON_IMPROVEMENT = 0.01;
+    public final int ITERATION_LIMIT = 1000;
+    public final double LOG_NON_IMPROVEMENT = 0.01;
 
     // Reads values from console and populates A, B, pi
-    public static void read_hmm(BufferedReader reader) {
+    public void read_hmm(BufferedReader reader) {
         A = matrixOps.read_matrix(reader);
         B = matrixOps.read_matrix(reader);
         pi = matrixOps.read_matrix(reader);
@@ -27,27 +27,18 @@ public class HMM {
         emissions = B[0].length;
     }
 
-    // Starts h,, with random values
-    public static void randomInit(int st, int emi) {
-        states = st;
-        emissions = emi;
-        A = matrixOps.randomMatrix(states, states, true);
-        B = matrixOps.randomMatrix(states, emissions, true);
-        pi = matrixOps.randomMatrix(1, states, false);
-    }
-
-    // Reads values from console and populates A, B, pi
-    public static void print_hmm() {
-        System.out.println("A:");
-        System.out.println(Arrays.deepToString(A));
-        System.out.println("B:");
-        System.out.println(Arrays.deepToString(B));
-        System.out.println("pi:");
-        System.out.println(Arrays.deepToString(pi));
+    // Prints A, B, pi
+    public void print_hmm() {
+        System.err.println("A:");
+        matrixOps.print_matrix(A);
+        System.err.println("B:");
+        matrixOps.print_matrix(B);
+        System.err.println("pi:");
+        matrixOps.print_matrix(pi);
     }
 
     // Returns next emission probability
-    public static void next_emission() {
+    public void next_emission() {
         double[][] state_prob = matrixOps.multiply(pi, A);
         double[][] emission_prob = matrixOps.multiply(state_prob, B);
         matrixOps.print_matrix(emission_prob);
@@ -55,7 +46,7 @@ public class HMM {
 
     // Uses forward algorithm to compute probability of
     // a given sequence of observations
-    public static Pair<double[][], double[]> fwdAlgorithm(int[] observations) {
+    public Pair<double[][], double[]> fwdAlgorithm(int[] observations) {
         int T = observations.length;
         double[][] alpha = new double[states][T]; // Matrix of all computed alphas
         double[] norm_ctes = new double[T];
@@ -83,7 +74,8 @@ public class HMM {
                 alpha[i][t] = alpha[i][t] * B[i][observations[t]];
                 norm_ctes[t] += alpha[i][t];
             }
-            norm_ctes[t] = 1 / norm_ctes[t];
+            
+            norm_ctes[t] = 1 / (norm_ctes[t]);
             for (int i = 0; i < states; i++) {
                 alpha[i][t] = alpha[i][t] * norm_ctes[t];
             }
@@ -95,7 +87,7 @@ public class HMM {
     }
 
     /* Uses backward algorithm to compute the sequence of betas */
-    public static double[][] bkwAlgorithm(int[] observations, double[] norm_ctes) {
+    public double[][] bkwAlgorithm(int[] observations, double[] norm_ctes) {
         int T = observations.length;
         double[][] beta = new double[states][T];
 
@@ -120,7 +112,7 @@ public class HMM {
 
     // Uses viterbi algorithm to compute the most likely sequence
     // given a set of observations
-    public static int[] viterbiAlgorithm(int[] observations) {
+    public int[] viterbiAlgorithm(int[] observations) {
 
         int[] result = new int[observations.length];
         int[][] path = new int[pi[0].length][observations.length]; // Array of possible combinations per time
@@ -154,7 +146,7 @@ public class HMM {
         return result;
     }
 
-    public static void updateHMM(int[] observations) {
+    public void updateHMM(int[] observations) {
         int T = observations.length;
 
         // Forward pass
@@ -165,13 +157,13 @@ public class HMM {
         // Backward pass
         double[][] beta = bkwAlgorithm(observations, norm_ctes);
 
-        // System.out.print("Alpha");
+        // System.err.print("Alpha");
         // matrixOps.print_matrix(alpha);
-        // System.out.print("CTES");
+        // System.err.print("CTES");
         // matrixOps.print_vector(norm_ctes);
-        // System.out.print("BETA");
+        // System.err.print("BETA");
         // matrixOps.print_matrix(beta);
-        // System.out.print("##################");
+        // System.err.print("##################");
 
         // Compute di_gamma & gamma
         // (OBS: NO need to normalize gammas since we use both alpha and beta)
@@ -232,7 +224,7 @@ public class HMM {
         }
     }
 
-    public static void baumWelch(int[] observations) {
+    public double baumWelch(int[] observations) {
         int iterations = 0;
         double log_prob_ant = - (LOG_NON_IMPROVEMENT + 1);
         double log_prob = 0;
@@ -246,22 +238,18 @@ public class HMM {
 
             log_prob = 0;
             for (int i = 0; i < norm_ctes.length; i++) {
-                log_prob -= Math.log(norm_ctes[i]);
+                if (norm_ctes[i] != 0)  // To avoid -infinity in logarith
+                    log_prob -= Math.log(norm_ctes[i]);
             }
 
             if (iterations == 0)
                 log_prob_ant = log_prob - (LOG_NON_IMPROVEMENT + 1);
-            // System.out.println("Log ant: " + log_prob_ant);
-            // System.out.println("Log act: " + log_prob);
-            // System.out.println("Dif: " + (log_prob - log_prob_ant));
-            // System.out.println("----");
             iterations++;
         }
-        // System.out.println(iterations);
+        return log_prob;
     }
 
-    // Does baum-welch and returns iterations and final log(prob) to build graphs
-    public static Pair<Double, Integer> baumWelchWithDetails(int[] observations) {
+    public double baumWelchDebug(int[] observations) {
         int iterations = 0;
         double log_prob_ant = - (LOG_NON_IMPROVEMENT + 1);
         double log_prob = 0;
@@ -275,16 +263,24 @@ public class HMM {
 
             log_prob = 0;
             for (int i = 0; i < norm_ctes.length; i++) {
-                log_prob -= Math.log(norm_ctes[i]);
+            System.err.print(", ");
+            System.err.print(norm_ctes[i]);
+                if (norm_ctes[i] != 0 && norm_ctes[i] != Double.POSITIVE_INFINITY)  // To avoid -infinity in logarith
+                    log_prob -= Math.log(norm_ctes[i]);
             }
+            // System.err.println(log_prob);
 
             if (iterations == 0)
                 log_prob_ant = log_prob - (LOG_NON_IMPROVEMENT + 1);
+            // System.err.println("Log ant: " + log_prob_ant);
+            // System.err.println("Log act: " + log_prob);
+            // System.err.println("Dif: " + (log_prob - log_prob_ant));
+            // System.err.println("----");
             iterations++;
         }
-        Pair<Double, Integer> summary = new Pair<Double, Integer>();
-        summary.first = log_prob;
-        summary.second = iterations;
-        return summary;
+        System.err.println();
+        System.err.print("iterations: ");
+        System.err.println(iterations);
+        return log_prob;
     }
 }
