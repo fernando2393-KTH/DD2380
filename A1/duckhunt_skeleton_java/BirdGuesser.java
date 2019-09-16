@@ -133,8 +133,6 @@ class BirdGuesser {
 
     public void manageRevelations(BirdModel[] birds, int[] pSpecies) {
         int n_birds = birds.length;
-        int error = 0;
-        int unknown = 0;
         for (int i = 0; i < n_birds; i++) {
             BirdModel bird = birds[i];
             int real_species = pSpecies[i];
@@ -148,22 +146,16 @@ class BirdGuesser {
             }
             BirdGroup bird_group = getGroup(group_id);
             if (bird_group.species == -1) { // Case we didnt know group species
-                unknown++;
                 bird_group.setSpecies(real_species);
                 continue;
             }
             if (bird_group.species != real_species) { // Case we did a mistake
-                error++;
                 bird_group.removeBird(bird, true);
                 appendKnownBird(bird, real_species);
                 continue;
             }
         }
         updateGroups();
-        System.err.print("Errors: ");
-        System.err.print(error);
-        System.err.print(", Unknown: ");
-        System.err.println(unknown);
     }
 
     public void printGrouping(BirdModel[] bird_model, int[] assignments) {

@@ -100,9 +100,9 @@ class BirdGroup extends BirdModel {
     }
 
     public void setSpecies(int species_id) {
-        System.err.print(groupID);
-        System.err.print(" <- ");
-        System.err.println(species_id);
+        // System.err.print(groupID);
+        // System.err.print(" <- ");
+        // System.err.println(species_id);
 
         if (species_to_birdgroup.containsKey(species_id))
             if (species_to_birdgroup.get(species_id) != this) { // Move all birds there

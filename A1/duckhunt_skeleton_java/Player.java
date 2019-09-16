@@ -3,6 +3,7 @@ class Player {
     private int timestep;
     private BirdManager bird_manager;
     private BirdGuesser bird_guesser;
+    private int[] sent_guesses;
 
     public static final int START_SHOOTING = 100;
 
@@ -59,11 +60,11 @@ class Player {
         // bird_guesser.computeSimilarityMatrix(bird_manager.bird_models);
         // matrixOps.print_matrix(bird_guesser.similarities);
         bird_manager.updateBirdModels();
-        int[] guesses = new int[pState.getNumBirds()];
-        guesses = bird_guesser.getGuesses(bird_manager.bird_models);
+        sent_guesses = new int[pState.getNumBirds()];
+        sent_guesses = bird_guesser.getGuesses(bird_manager.bird_models);
         // bird_guesser.printGrouping(bird_manager.bird_models, guesses);
 
-        return guesses;
+        return sent_guesses;
     }
 
     /**
@@ -78,6 +79,26 @@ class Player {
         // System.err.println("HIT BIRD!!!");
     }
 
+    private void guessing_statistics(int[] real_vals) {
+        int correct = 0;
+        int error = 0;
+        int unknown = 0;
+        for (int i = 0; i < real_vals.length; i ++) {
+            if (sent_guesses[i] == -1)
+                unknown++;
+            else if (sent_guesses[i] == real_vals[i])
+                correct++;
+            else
+                error++;
+        }
+        System.err.print("Correct: ");
+        System.err.print(correct);
+        System.err.print(", Errors: ");
+        System.err.print(error);
+        System.err.print(", Unknown: ");
+        System.err.println(unknown);
+    }
+
     /**
      * If you made any guesses, you will find out the true species of those birds
      * through this function.
@@ -87,9 +108,10 @@ class Player {
      * @param pDue     time before which we must have returned
      */
     public void reveal(GameState pState, int[] pSpecies, Deadline pDue) {
-        System.err.println("--------------------revealing: ");
+        // System.err.println("--------------------revealing: ");
         bird_guesser.manageRevelations(bird_manager.bird_models, pSpecies);
         // bird_guesser.printGrouping(bird_manager.bird_models, pSpecies);
+        guessing_statistics(pSpecies);
 
         // System.err.print("###### PUNCTUATION: ");
         // System.err.println(pState.myScore());
