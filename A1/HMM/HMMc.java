@@ -16,11 +16,7 @@ public class HMMc {
 
         HMM hmm = new HMM();
         HMM hmm_original = new HMM();
-
-        
-        hmm_original.A = A_real;
-        hmm_original.B = B_real;
-        hmm_original.pi = pi_real;
+        hmm_original.assignValues(A_real, B_real, pi_real);
         
         // Reader to read from terminal
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -33,7 +29,7 @@ public class HMMc {
         // changing states param)
 
         //HMM.randomInit(4, 4);
-
+        hmm_original.print_hmm();
         hmm.print_hmm(); // Printing the randomly generated matrix
 
 
@@ -48,11 +44,7 @@ public class HMMc {
         
         int[] obs = matrixOps.read_vector(reader);
 
-        try {
-            reader.close();
-        } catch (Exception e) {
-            System.err.println(e);
-        }
+
 
         double last_log_prob_array[] = new double[obs.length / IT_INCREMENT];
         double iterations_array[] = new double[obs.length / IT_INCREMENT];
@@ -62,24 +54,24 @@ public class HMMc {
         double error_matrices[] = new double[obs.length / IT_INCREMENT];
 
         for (int i = 10; i < obs.length + 1; i = i + IT_INCREMENT) { // Increment of 10 observations per iteration
+            int[] obs_subarray = Arrays.copyOfRange(obs, 0, i);
 
-            Pair<Double, Integer> nw_details = hmm.baumWelchWithDetails(Arrays.copyOfRange(obs, 0, i));
+            // TODO(Fernando) : reset hmm every time
+            Pair<Double, Integer> nw_details = hmm.baumWelchWithDetails(obs_subarray);
+            Double estimated_log_prob = hmm.obsLogProb(obs_subarray);
+            Double original_log_prob = hmm_original.obsLogProb(obs_subarray);
 
-            Pair<double[][], double[]> alpha_info = hmm_original.fwdAlgorithm(Arrays.copyOfRange(obs, 0, i));
-            double[] norm_ctes = alpha_info.second;
+            // System.out.println(estimated_log_prob);
 
-            int log_prob_original = 0;
-            for (int j = 0; j < norm_ctes.length; j++) {
-                    log_prob_original -= Math.log(norm_ctes[j]);
-            }
-
-            last_log_prob_array[i / IT_INCREMENT - 1] = nw_details.first;
+            last_log_prob_array[i / IT_INCREMENT - 1] = estimated_log_prob;
             iterations_array[i / IT_INCREMENT - 1] = nw_details.second;
-            //error_A_array[i / IT_INCREMENT - 1] = matrixOps.forbDistance(hmm.A, A_real);
-            //error_B_array[i / IT_INCREMENT - 1] = matrixOps.forbDistance(hmm.B, B_real);
-            //error_pi_array[i / IT_INCREMENT - 1] = matrixOps.forbDistance(hmm.pi, pi_real);
-            error_matrices[i / IT_INCREMENT - 1] = Math.abs(nw_details.first - log_prob_original); // Calculation of the difference of probabilities
+            error_matrices[i / IT_INCREMENT - 1] = Math.abs(estimated_log_prob - original_log_prob); // Calculation of the difference of probabilities
+        }
 
+        try {
+            reader.close();
+        } catch (Exception e) {
+            System.err.println(e);
         }
 
         if (DEBUG) {
@@ -142,7 +134,7 @@ public class HMMc {
                 }
             }
 
-            System.out.println();
+            // System.out.println();
 
         }
 

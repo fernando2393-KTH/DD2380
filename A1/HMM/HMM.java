@@ -27,6 +27,14 @@ public class HMM {
         emissions = B[0].length;
     }
 
+    public void assignValues(double[][] a, double[][] b, double[][] p) {
+        A = a;
+        B = b;
+        pi = p;
+        states = A.length;
+        emissions = B[0].length;
+    }
+
     // Starts h,, with random values
     public void randomInit(int st, int emi) {
         states = st;
@@ -45,6 +53,7 @@ public class HMM {
         System.out.println("pi:");
         System.out.println(Arrays.deepToString(pi));
     }
+
 
     // Returns next emission probability
     public void next_emission() {
@@ -92,6 +101,17 @@ public class HMM {
         result.first = alpha;
         result.second = norm_ctes;
         return result;
+    }
+
+    public double obsLogProb(int[] observations) {
+        Pair<double[][], double[]> alpha_info = fwdAlgorithm(observations);
+        double[] ctes = alpha_info.second;
+
+        double cte = 0;
+        for (int i = 0; i < ctes.length; i++) {
+            cte -= Math.log(ctes[i]);
+        }
+        return cte;
     }
 
     /* Uses backward algorithm to compute the sequence of betas */
