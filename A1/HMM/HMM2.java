@@ -4,10 +4,13 @@ import java.io.InputStreamReader;
 
 public class HMM2 {
     public static void main(String[] args) {
+
+        HMM hmm = new HMM();
+
         // Reader to read from terminal
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        HMM.read_hmm(reader);
+        hmm.read_hmm(reader);
 
         int [] obs = matrixOps.read_vector(reader);
 
@@ -17,7 +20,7 @@ public class HMM2 {
             System.err.println(e);
         }
 
-        int[] sequence = HMM.viterbiAlgorithm(obs);
+        int[] sequence = hmm.viterbiAlgorithm(obs);
 
         System.out.print(sequence[0]);
         for (int i = 1; i < sequence.length; i++){

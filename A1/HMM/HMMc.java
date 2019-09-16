@@ -13,10 +13,19 @@ public class HMMc {
     private static final boolean DEBUG = true;
 
     public static void main(String[] args) {
+
+        HMM hmm = new HMM();
+        HMM hmm_original = new HMM();
+
+        
+        hmm_original.A = A_real;
+        hmm_original.B = B_real;
+        hmm_original.pi = pi_real;
+        
         // Reader to read from terminal
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        HMM.read_hmm(reader);
+        hmm.read_hmm(reader);
         
         // int states = 3;
         // int emissions = 4;
@@ -25,7 +34,7 @@ public class HMMc {
 
         //HMM.randomInit(4, 4);
 
-        HMM.print_hmm(); // Printing the randomly generated matrix
+        hmm.print_hmm(); // Printing the randomly generated matrix
 
 
         // Reads the first three lines for question 8, since matrix is initialized in other way
@@ -47,27 +56,35 @@ public class HMMc {
 
         double last_log_prob_array[] = new double[obs.length / IT_INCREMENT];
         double iterations_array[] = new double[obs.length / IT_INCREMENT];
-        double error_A_array[] = new double[obs.length / IT_INCREMENT];
-        double error_B_array[] = new double[obs.length / IT_INCREMENT];
-        double error_pi_array[] = new double[obs.length / IT_INCREMENT];
+        //double error_A_array[] = new double[obs.length / IT_INCREMENT];
+        //double error_B_array[] = new double[obs.length / IT_INCREMENT];
+        //double error_pi_array[] = new double[obs.length / IT_INCREMENT];
+        double error_matrices[] = new double[obs.length / IT_INCREMENT];
 
         for (int i = 10; i < obs.length + 1; i = i + IT_INCREMENT) { // Increment of 10 observations per iteration
 
-            Pair<Double, Integer> nw_details = HMM.baumWelchWithDetails(Arrays.copyOfRange(obs, 0, i)); // Increment
-                                                                                                        // number of
-                                                                                                        // observations
-                                                                                                        // per iteration
+            Pair<Double, Integer> nw_details = hmm.baumWelchWithDetails(Arrays.copyOfRange(obs, 0, i));
+
+            Pair<double[][], double[]> alpha_info = hmm_original.fwdAlgorithm(Arrays.copyOfRange(obs, 0, i));
+            double[] norm_ctes = alpha_info.second;
+
+            int log_prob_original = 0;
+            for (int j = 0; j < norm_ctes.length; j++) {
+                    log_prob_original -= Math.log(norm_ctes[j]);
+            }
+
             last_log_prob_array[i / IT_INCREMENT - 1] = nw_details.first;
             iterations_array[i / IT_INCREMENT - 1] = nw_details.second;
-            error_A_array[i / IT_INCREMENT - 1] = matrixOps.forbDistance(HMM.A, A_real);
-            error_B_array[i / IT_INCREMENT - 1] = matrixOps.forbDistance(HMM.B, B_real);
-            error_pi_array[i / IT_INCREMENT - 1] = matrixOps.forbDistance(HMM.pi, pi_real);
+            //error_A_array[i / IT_INCREMENT - 1] = matrixOps.forbDistance(hmm.A, A_real);
+            //error_B_array[i / IT_INCREMENT - 1] = matrixOps.forbDistance(hmm.B, B_real);
+            //error_pi_array[i / IT_INCREMENT - 1] = matrixOps.forbDistance(hmm.pi, pi_real);
+            error_matrices[i / IT_INCREMENT - 1] = Math.abs(nw_details.first - log_prob_original); // Calculation of the difference of probabilities
 
         }
 
         if (DEBUG) {
 
-            for (int i = 0; i < obs.length / IT_INCREMENT; i++) {
+            /*for (int i = 0; i < obs.length / IT_INCREMENT; i++) {
                 if (i < obs.length / IT_INCREMENT - 1) {
                     System.out.print(last_log_prob_array[i] + ", ");
                 } else {
@@ -115,11 +132,21 @@ public class HMMc {
                 }
             }
 
+            System.out.println();*/
+
+            for (int i = 0; i < obs.length / IT_INCREMENT; i++) {
+                if (i < obs.length / IT_INCREMENT - 1) {
+                    System.out.print(error_matrices[i] + ", ");
+                } else {
+                    System.out.print(error_matrices[i]);
+                }
+            }
+
             System.out.println();
 
         }
 
-        HMM.print_hmm();
+        //hmm.print_hmm();
 
         // System.out.println("error_A: " + error_A);
         // System.out.println("error_B: " + error_B);
