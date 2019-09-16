@@ -18,87 +18,81 @@ class BirdGuesser {
         bird_groups = new ArrayList<BirdGroup>();
     }
 
-    // Return group of id id
-    public BirdGroup getGroup(int id) {
-        Iterator itr = bird_groups.iterator();
-        while (itr.hasNext()) {
-            BirdGroup bg = (BirdGroup) itr.next();
-            if (bg.groupID == id)
-                return bg;
-        }
-        return bird_groups.get(0);
-    }
-
-    public void appendNewGroup(BirdModel bird) {
-        BirdGroup bird_group = new BirdGroup(bird_groups.size(), bird.species, states, emissions);
+    public BirdGroup appendNewGroup(BirdModel bird) {
+        BirdGroup bird_group = new BirdGroup(bird.species, states, emissions);
         bird_group.appendBird(bird, true);
         bird_groups.add(bird_group);
+        bird.groupDistance = 0;
+        return bird_group;
     }
 
     // Returns (birdGroup, distance)
-    public Pair<Integer, Double> getBirdGroup(BirdModel bird) {
-        Pair<Integer, Double> result = new Pair<Integer, Double>();
-        result.first = -1;
+    public Pair<BirdGroup, Double> getBirdGroup(BirdModel bird) {
+        Pair<BirdGroup, Double> result = new Pair<BirdGroup, Double>();
+        result.first = null;
+
+        if (bird.group != null) {
+            result.first = bird.group;
+            result.second = bird.groupDistance;
+            return result;
+        }
 
         double min = Double.POSITIVE_INFINITY;
-        int min_index = -1;
-        for (int i = 0; i < bird_groups.size(); ++i) {
-            if (bird_groups.get(i).hasBird(bird)) { // Case bird is already in group
-                min = bird_groups.get(i).minimumDistance(bird);
-                min_index = i;
-                System.err.print("birdingroup");
-                break;
-            }
-            double distance = bird_groups.get(i).minimumDistance(bird);
+        Iterator itr = bird_groups.iterator();
+        while (itr.hasNext()) {
+            BirdGroup bg = (BirdGroup) itr.next();
+            double distance = bg.minimumDistance(bird);
             if (distance < min) {
                 min = distance;
                 // if (bird_groups.get(i).species == -1)
                 //     min = 2*min; // This will enhance grouping into existing ones
-                min_index = i;
+                result.first = bg;
             }
         }
         result.second = min;
-        if (min < MIN_RELATABLE)
-            result.first = min_index;
+        if (min > MIN_RELATABLE)
+            result.first = null;
         return result;
     }
 
-    // Appends unguessed bird into closes group (creates new one if none are close
-    // enough)
+    // Appends unguessed bird into closest group (or new created)
     public void appendUnknownBird(BirdModel bird) {
-        Pair<Integer, Double> bird_group = getBirdGroup(bird);
-        if (bird_group.first != -1) { // If group close enough
-            bird_groups.get(bird_group.first).appendBird(bird, true);
+        Pair<BirdGroup, Double> bird_group_info = getBirdGroup(bird);
+        if (bird_group_info.first != null) { // If group close enough
+            bird_group_info.first.appendBird(bird, true);
+            bird.groupDistance = bird_group_info.second;
         } else { // Create new group
-            appendNewGroup(bird);
+            BirdGroup new_group = appendNewGroup(bird);
         }
     }
 
     public void appendKnownBird(BirdModel bird, int species_id) {
-        if (bird_groups.size() == 0) { // Case no groups in bird_groups
-            appendNewGroup(bird);
+        if (bird_groups.isEmpty()) { // Case no groups in bird_groups
+            BirdGroup new_group = appendNewGroup(bird);
             return;
         }
         if (bird_groups.get(0).species_to_birdgroup.containsKey(species_id)) { // Case group with that id exists
             BirdGroup bird_group = bird_groups.get(0).species_to_birdgroup.get(species_id);
             bird_group.appendBird(bird, true);
-        } else { // Case no group with that id is found
+        } else { // Case no group with that id is found (GET CLOSEST WITH ID 0)
             double min = Double.POSITIVE_INFINITY;
-            int min_index = -1;
-            for (int i = 0; i < bird_groups.size(); ++i) {
-                BirdGroup bird_group = bird_groups.get(i);
-                if (bird_group.species == -1) { // Consider only unknow species group
-                    double distance = bird_group.minimumDistance(bird);
+            BirdGroup min_dist_bg = null;
+            Iterator itr = bird_groups.iterator();
+            while (itr.hasNext()) {
+                BirdGroup bg = (BirdGroup) itr.next();
+                if (bg.species == -1) {
+                    double distance = bg.minimumDistance(bird);
                     if (distance < min) {
                         min = distance;
-                        min_index = i;
+                        min_dist_bg = bg;
                     }
                 }
             }
             if (min < MIN_RELATABLE) { // Case there is a close one without category
-                bird_groups.get(min_index).appendBird(bird, true);
+                min_dist_bg.appendBird(bird, true);
+                bird.groupDistance = min;
             } else { // Case we have to create a new group
-                appendNewGroup(bird);
+                BirdGroup new_group = appendNewGroup(bird);
             }
         }
 
@@ -107,14 +101,13 @@ class BirdGuesser {
     public int[] getGuesses(BirdModel[] birds) {
         int[] guesses = new int[birds.length];
         for (int i = 0; i < birds.length; i++) {
-            Pair<Integer, Double> bird_group = getBirdGroup(birds[i]);
-            if (bird_group.first != -1) { // Case no close group found
-                bird_groups.get(bird_group.first).appendBird(birds[i], true);
+            Pair<BirdGroup, Double> bird_group_info = getBirdGroup(birds[i]);
+            if (bird_group_info.first != null) { // Case no close group found
+                bird_group_info.first.appendBird(birds[i], true);
             } else {
-                appendNewGroup(birds[i]);
-                bird_group.first = bird_groups.size() - 1;
+                bird_group_info.first = appendNewGroup(birds[i]);
             }
-            guesses[i] = bird_groups.get(bird_group.first).assignSpecies();
+            guesses[i] = bird_group_info.first.assignSpecies();
         }
         return guesses;
     }
@@ -136,15 +129,14 @@ class BirdGuesser {
         for (int i = 0; i < n_birds; i++) {
             BirdModel bird = birds[i];
             int real_species = pSpecies[i];
-            int group_id = bird.groupID;
+            BirdGroup bird_group = bird.group;
 
             // Save bird species
             bird.species = real_species;
-            if (group_id == -1) { // Case bird didnt have group (shouldnt happen)
+            if (bird_group == null) { // Case bird didnt have group (shouldnt happen)
                 appendKnownBird(bird, real_species);
                 continue;
             }
-            BirdGroup bird_group = getGroup(group_id);
             if (bird_group.species == -1) { // Case we didnt know group species
                 bird_group.setSpecies(real_species);
                 continue;
@@ -167,17 +159,5 @@ class BirdGuesser {
             BirdGroup bg = (BirdGroup) itr.next();
             bg.printGroup(bird_groups);
         }
-        // for (int i = 0; i < bird_model.length; i++) {
-        // bird_model[i].printBirdInfo(false);
-        // Iterator itr2 = bird_groups.iterator();
-        // System.err.print("Distances: ");
-        // while (itr2.hasNext()) {
-        // BirdGroup bg = (BirdGroup) itr2.next();
-        // System.err.print(Math.round(bg.getDistance(bird_model[i])*100.)/100.);
-        // System.err.print(" ");
-        // }
-        // System.err.println();
-
-        // }
     }
 }

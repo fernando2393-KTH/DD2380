@@ -6,16 +6,14 @@ import java.util.Iterator;
 
 // Class to hold group of birds
 class BirdGroup extends BirdModel {
-    public int groupID; // This groupID (same as pos in list) NOT SURE IF NECESSARY
     public int species; // Bird id representing group
     public boolean[] tried; // True if species i has been ettempted to guess (to make different guesses)
 
     public ArrayList<BirdModel> birds_grouped;
     public static Map<Integer, BirdGroup> species_to_birdgroup = new HashMap<>();
 
-    public BirdGroup(int group_id, int species_id, int st, int emi) {
+    public BirdGroup(int species_id, int st, int emi) {
         super(st, emi);
-        groupID = group_id;
         species = species_id;        
         tried = new boolean[6];
         birds_grouped = new ArrayList<BirdModel>();
@@ -48,17 +46,33 @@ class BirdGroup extends BirdModel {
 
     // Appends bird to group
     public void appendBird(BirdModel bird, boolean update_model) {
+        // If bird already in this group
+        if (bird.group == this)
+            return;
+        
+        // If wrong group
         if (bird.species != -1 && species != -1 && bird.species != species) {
             System.err.println("Wrong bird in this group");
+            return;
         }
-        bird.groupID = groupID;
+
+        // Remove from other groups
+        // if (bird.group != null && bird.group != this) {
+        //     bird.group.removeBird(bird, false);
+        // }
+
+        // Assign bird group to this one
+        bird.group = this;
         
+        // Add to list of birds in group
         if (!birds_grouped.contains(bird))
             birds_grouped.add(bird);
 
+        // If bird has species, set species for the group
         if (bird.species != -1) {
             setSpecies(bird.species);
         }
+        // If first group update
         if (birds_grouped.size() == 1) {
             update_model = true;
         }
@@ -68,7 +82,10 @@ class BirdGroup extends BirdModel {
 
     // Removes a bird from group (VERY IMPROVABLE)
     public void removeBird(BirdModel bird, boolean update_model) {
-        bird.groupID = -1;
+        if (!birds_grouped.contains(bird)) {
+            return;
+        }
+        bird.group = null;
         Iterator itr = birds_grouped.iterator();
         while (itr.hasNext()) {
             BirdModel b = (BirdModel) itr.next();
@@ -129,7 +146,7 @@ class BirdGroup extends BirdModel {
 
     public void printGroup(ArrayList<BirdGroup> bird_groups) {
         System.err.print("Group: ");
-        System.err.println(groupID);
+        System.err.println(this.hashCode());
         System.err.print("Species: ");
         System.err.println(species);
         System.err.print("Birds: ");
@@ -152,19 +169,20 @@ class BirdGroup extends BirdModel {
 
     // Returns minimal distance between 
     public double minimumDistance(BirdModel bird) {
-        double min = Double.POSITIVE_INFINITY;
-        Iterator itr = birds_grouped.iterator();
-        while (itr.hasNext()) {
-            BirdModel bm = (BirdModel) itr.next();
-                if (bm.species == species) {
-                double distance = bm.getDistance(bird);
-                if (distance < min) {
-                    min = distance;
-                }
-            }
-        }
-        return min;
-        // return super.getDistance(bird);
+        // double min = Double.POSITIVE_INFINITY;
+        // Iterator itr = birds_grouped.iterator();
+        // while (itr.hasNext()) {
+        //     BirdModel bm = (BirdModel) itr.next();
+        //         if (bm.species == species) {
+        //         double distance = bm.getDistance(bird);
+        //         if (distance < min) {
+        //             min = distance;
+        //         }
+        //     }
+        // }
+        // return min;
+        // return birds_grouped.get(0).getDistance(bird);
+        return super.getDistance(bird);
     }
 
 }

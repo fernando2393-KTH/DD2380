@@ -31,13 +31,14 @@ public class BirdManager {
     public void updateBirdObss(GameState pState) {
         for (int i = 0; i < bird_models.length; i++) {
             Bird bird = pState.getBird(i);
-            if (bird.isAlive()) {
+            if (bird.isAlive() && bird.getLastObservation() != -1) {
                 bird_models[i].addObservation(bird.getLastObservation());
             }
         }
     }
 
     public void updateBirdModels() {
+        System.err.println("Updating models...");
         for (int i = 0; i < bird_models.length; i++)
             bird_models[i].updateModel();
     }
@@ -53,16 +54,7 @@ public class BirdManager {
                 if (Double.isNaN(bird_models[i].confidence)) {
                     System.err.print("Nan in confidence: ");
                     System.err.println(i);
-                    // bird_models[i].printBirdInfo();
-
-                    // Try to reset it
-                    bird_models[i] = new BirdModel(states, emissions);
-                    for (int j = 0; j < timestep; ++ j)
-                        bird_models[i].addObservation(bird.getObservation(j));
-                    // bird_models[i].updateModel();
-                    // bird_models[i].updateModelDebug();
-                    // bird_models[i].printBirdInfo();
-                    // System.exit(0);
+                    bird_models[i].reset();
                 } else if (bird_models[i].confidence > max) {
                     max_bird = i;
                     max = bird_models[i].confidence;

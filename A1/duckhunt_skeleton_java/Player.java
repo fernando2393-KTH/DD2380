@@ -9,8 +9,8 @@ class Player {
 
     public Player() {
         timestep = 0;
-        bird_manager = new BirdManager(3, 9);
-        bird_guesser = new BirdGuesser(3, 9);
+        bird_manager = new BirdManager(2, 9);
+        bird_guesser = new BirdGuesser(2, 9);
     }
 
     // Methods to run once the round is finished
@@ -31,42 +31,29 @@ class Player {
 
         bird_manager.updateBirdObss(pState);
 
+        // Lower the load at guessing
+        if (timestep >= 99 - pState.getNumBirds() && timestep < 99) {
+            int pos = timestep - 99 + pState.getNumBirds();
+            BirdModel birdmodel = bird_manager.bird_models[pos];
+            birdmodel.updateModel();
+            bird_guesser.appendUnknownBird(birdmodel);
+        }
+
         if (timestep < START_SHOOTING)
             return cDontShoot;
 
-        Pair<Integer, Integer> shot_info = bird_manager.bestShoot(pState, timestep);
-        // System.err.print("t: ");
-        // System.err.print(timestep);
-        // System.err.print(" | ");
-        // System.err.print(shot_info.first);
-        // System.err.print(": ");
-        // System.err.println(shot_info.second);
-        // System.err.print(", points: ");
-        // System.err.println(pState.myScore());
-        if (shot_info.first == -1)
-            return cDontShoot;
-        return new Action(shot_info.first, shot_info.second);
+        // Pair<Integer, Integer> shot_info = bird_manager.bestShoot(pState, timestep);
 
-        // // This line would predict that bird 0 will move right and shoot at it.
-        // int min = 0;
-        // int max = pState.getNumBirds();
-        // int bird = (int)(Math.random() * ((max - min) + 1)) + min;
-        // return new Action(bird, Constants.MOVE_RIGHT);
+        // if (shot_info.first == -1)
+        //     return cDontShoot;
+        // return new Action(shot_info.first, shot_info.second);
+        return cDontShoot;
     }
 
     public int[] guess(GameState pState, Deadline pDue) {
-        System.err.println("--------------------guessing: " + timestep);
-        // speciesGuesser bird_guesser = new speciesGuesser();
-        // bird_guesser.computeSimilarityMatrix(bird_manager.bird_models);
-        // matrixOps.print_matrix(bird_guesser.similarities);
-        bird_manager.updateBirdModels();
-        // System.err.println(pDue.remainingMs());
+        // System.err.println("--------------------guessing: " + timestep);
         sent_guesses = new int[pState.getNumBirds()];
         sent_guesses = bird_guesser.getGuesses(bird_manager.bird_models);
-        // System.err.println(pDue.remainingMs());
-
-        // bird_guesser.printGrouping(bird_manager.bird_models, guesses);
-
         return sent_guesses;
     }
 
@@ -79,7 +66,7 @@ class Player {
      * @param pDue   time before which we must have returned
      */
     public void hit(GameState pState, int pBird, Deadline pDue) {
-        System.err.println("HIT BIRD!!!");
+        // System.err.println("HIT BIRD!!!");
     }
 
     private void guessing_statistics(int[] real_vals) {
@@ -102,11 +89,6 @@ class Player {
         System.err.println(unknown);
     }
 
-    private void print_remaining(Deadline pDue) {
-        System.err.print("MS Left:");
-        System.err.println(pDue.remainingMs());
-    }
-
     /**
      * If you made any guesses, you will find out the true species of those birds
      * through this function.
@@ -120,11 +102,8 @@ class Player {
 
         bird_guesser.manageRevelations(bird_manager.bird_models, pSpecies);
         // bird_guesser.printGrouping(bird_manager.bird_models, pSpecies);
+        // guessing_statistics(pSpecies);
 
-        guessing_statistics(pSpecies);
-
-        // System.err.print("###### PUNCTUATION: ");
-        // System.err.println(pState.myScore());
         endRound();
 
         // if (pState.getRound() == 1)

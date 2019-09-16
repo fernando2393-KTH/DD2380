@@ -29,3 +29,5 @@ then
 else
     java Main server load "$environment" < player2server | java Main verbose > player2server
 fi
+
+make clean;

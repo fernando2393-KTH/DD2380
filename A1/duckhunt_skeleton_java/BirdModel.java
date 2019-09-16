@@ -6,16 +6,25 @@ public class BirdModel extends HMM {
     // OBS: confidence is negative and the highest, the better: log(prob)
 
     // Grouping variables
-    public int groupID = -1;  // Grouped by similitude
-    public int species = -1;  // Grouped by similitude
+    public BirdGroup group = null;  // Grouped by similitude
+    public double groupDistance = Double.POSITIVE_INFINITY;
+    public int species = -1;  // Bird species
 
     // Class constructor (randomly initializes A, B, pi)
     public BirdModel(int states, int emissions) {
         super.A = matrixOps.randomMatrix(states, states, true);
-        super.B = matrixOps.randomMatrix(states, emissions, true);
+        super.B = matrixOps.randomMatrix(states, emissions, false);
         super.pi = matrixOps.randomMatrix(1, states, false);
         super.states = states;
         super.emissions = emissions;
+    }
+
+    // Resets and recomputes matrices (usefull when nans appear)
+    public void reset() {
+        super.A = matrixOps.randomMatrix(super.states, super.states, true);
+        super.B = matrixOps.randomMatrix(super.states, super.emissions, false);
+        super.pi = matrixOps.randomMatrix(1, super.states, false);
+        updateModel();
     }
 
     // Append an observation to BirdModel observations
@@ -65,7 +74,7 @@ public class BirdModel extends HMM {
         System.err.print("Hash: ");
         System.err.print(this.hashCode());
         System.err.print("  Group: ");
-        System.err.print(groupID);
+        System.err.print(group.hashCode());
         System.err.print(", Species: ");
         System.err.print(species);
         System.err.print(", Conf:");
@@ -78,20 +87,6 @@ public class BirdModel extends HMM {
 
     // Given another BirdModel returns the difference among them
     public double getDistance(BirdModel bird) {
-        Pair<double[][], double[]> alpha_info = super.fwdAlgorithm(bird.observations);
-        double[] ctes = alpha_info.second;
-
-        double cte = 0;
-        for (int i = 0; i < ctes.length; i++) {
-            cte -= Math.log(ctes[i]);
-        }
-        
-        // double dif = 0;
-        // dif += matrixOps.distance(super.A, bird.A);
-        // dif += matrixOps.distance(super.B, bird.B);
-        // dif += matrixOps.distance(super.pi, bird.pi);
-        // dif += matrixOps.distance(observations, bird.observations);
-        return -cte;
-        // return dif/2;
+        return -super.obsLogProb(bird.observations);
     }
 }

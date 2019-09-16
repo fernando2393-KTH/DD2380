@@ -146,6 +146,18 @@ public class HMM {
         return result;
     }
 
+    // TODO(oleguer): optimize this, compute online log_c and dont store all alpha
+    public double obsLogProb(int[] observations) {
+        Pair<double[][], double[]> alpha_info = fwdAlgorithm(observations);
+        double[] ctes = alpha_info.second;
+
+        double cte = 0;
+        for (int i = 0; i < ctes.length; i++) {
+            cte -= Math.log(ctes[i]);
+        }
+        return cte;
+    }
+
     public void updateHMM(int[] observations) {
         int T = observations.length;
 
