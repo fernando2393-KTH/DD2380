@@ -15,7 +15,7 @@ public class HMM {
     static int states;
     static int emissions;
 
-    public static final int ITERATION_LIMIT = 1000;
+    public static final int ITERATION_LIMIT = 7;
     public static final double LOG_NON_IMPROVEMENT = 0.01;
 
     // Reads values from console and populates A, B, pi
@@ -232,7 +232,7 @@ public class HMM {
         }
     }
 
-    public static void baumWelch(int[] observations) {
+    public static double baumWelch(int[] observations) {
         int iterations = 0;
         double log_prob_ant = - (LOG_NON_IMPROVEMENT + 1);
         double log_prob = 0;
@@ -251,13 +251,9 @@ public class HMM {
 
             if (iterations == 0)
                 log_prob_ant = log_prob - (LOG_NON_IMPROVEMENT + 1);
-            // System.out.println("Log ant: " + log_prob_ant);
-            // System.out.println("Log act: " + log_prob);
-            // System.out.println("Dif: " + (log_prob - log_prob_ant));
-            // System.out.println("----");
             iterations++;
         }
-        // System.out.println(iterations);
+        return log_prob;
     }
 
     // Does baum-welch and returns iterations and final log(prob) to build graphs
