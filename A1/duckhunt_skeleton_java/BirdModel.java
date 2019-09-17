@@ -20,7 +20,7 @@ public class BirdModel extends HMM {
     }
 
     // Resets and recomputes matrices (usefull when nans appear)
-    public void reset() {
+    public void randomReset() {
         super.A = matrixOps.randomMatrix(super.states, super.states, true);
         super.B = matrixOps.randomMatrix(super.states, super.emissions, false);
         super.pi = matrixOps.randomMatrix(1, super.states, false);
@@ -34,6 +34,8 @@ public class BirdModel extends HMM {
 
     //Updates confidence and A, B, pi from linked HMM
     public void updateModel() {
+        System.err.print("OBSs: ");
+        System.err.println(observations.length);
         confidence = super.baumWelch(observations);
     }
 
@@ -87,6 +89,21 @@ public class BirdModel extends HMM {
 
     // Given another BirdModel returns the difference among them
     public double getDistance(BirdModel bird) {
-        return -super.obsLogProb(bird.observations);
+        double original_logprob = bird.obsLogProb(bird.observations);
+        double this_logprob = super.obsLogProb(bird.observations);
+        if (Double.isNaN(original_logprob))
+            System.err.print("non original");
+        if (Double.isNaN(this_logprob)){
+
+            // System.err.println("non this");
+            // this_logprob = Double.NEGATIVE_INFINITY;
+            // printBirdInfo(true);
+            // System.exit(0);
+
+        }
+
+        // return -this_logprob;
+        // System.err.println(Math.abs((original_logprob - this_logprob)/original_logprob));
+        return Math.abs((original_logprob - this_logprob)/original_logprob);
     }
 }

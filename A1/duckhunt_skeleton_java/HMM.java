@@ -153,8 +153,12 @@ public class HMM {
 
         double cte = 0;
         for (int i = 0; i < ctes.length; i++) {
+            // System.err.print(Math.round(ctes[i]));
+            // System.err.print(" ");
             cte -= Math.log(ctes[i]);
         }
+        // System.err.println();
+
         return cte;
     }
 

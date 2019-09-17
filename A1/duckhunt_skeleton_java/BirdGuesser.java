@@ -6,7 +6,7 @@ import java.util.Iterator;
 class BirdGuesser {
     public ArrayList<BirdGroup> bird_groups;
 
-    public double MIN_RELATABLE = 200; // Minimum similarity to make them related
+    public double MIN_RELATABLE = 0.9; // Minimum similarity to make them related
 
     public int states;
     public int emissions;

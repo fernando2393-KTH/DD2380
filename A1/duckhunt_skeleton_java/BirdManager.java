@@ -38,7 +38,7 @@ public class BirdManager {
     }
 
     public void updateBirdModels() {
-        System.err.println("Updating models...");
+        // System.err.println("Updating models...");
         for (int i = 0; i < bird_models.length; i++)
             bird_models[i].updateModel();
     }
@@ -54,7 +54,7 @@ public class BirdManager {
                 if (Double.isNaN(bird_models[i].confidence)) {
                     System.err.print("Nan in confidence: ");
                     System.err.println(i);
-                    bird_models[i].reset();
+                    bird_models[i].randomReset();
                 } else if (bird_models[i].confidence > max) {
                     max_bird = i;
                     max = bird_models[i].confidence;

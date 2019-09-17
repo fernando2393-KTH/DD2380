@@ -9,8 +9,8 @@ class Player {
 
     public Player() {
         timestep = 0;
-        bird_manager = new BirdManager(2, 9);
-        bird_guesser = new BirdGuesser(2, 9);
+        bird_manager = new BirdManager(3, 9);
+        bird_guesser = new BirdGuesser(3, 9);
     }
 
     // Methods to run once the round is finished
@@ -31,16 +31,28 @@ class Player {
 
         bird_manager.updateBirdObss(pState);
 
-        // Lower the load at guessing
-        if (timestep >= 99 - pState.getNumBirds() && timestep < 99) {
-            int pos = timestep - 99 + pState.getNumBirds();
-            BirdModel birdmodel = bird_manager.bird_models[pos];
-            birdmodel.updateModel();
-            bird_guesser.appendUnknownBird(birdmodel);
+        // Check if any bird died
+        for (int i = 0; i < pState.getNumBirds(); i++) {
+            Bird bird = pState.getBird(i);
+            // if (bird.getLastObservation() == -1) { // In case bird has just died
+            if (bird.isDead() && bird.wasAlive(timestep-2)) { // In case bird has just died
+                // System.err.println("Bird just died");
+                // System.err.print(bird.getObservation(timestep-2));
+                bird_manager.bird_models[i].updateModel();
+                // System.exit(0);
+            }
         }
 
-        if (timestep < START_SHOOTING)
-            return cDontShoot;
+        if (timestep > 97)
+            bird_manager.updateBirdModels();
+
+        // Lower the load at guessing
+        // if (timestep >= 99 - pState.getNumBirds() && timestep < 99) {
+        //     int pos = timestep - 99 + pState.getNumBirds();
+        //     BirdModel birdmodel = bird_manager.bird_models[pos];
+        //     birdmodel.updateModel();
+        //     bird_guesser.appendUnknownBird(birdmodel);
+        // }
 
         // Pair<Integer, Integer> shot_info = bird_manager.bestShoot(pState, timestep);
 
@@ -80,7 +92,17 @@ class Player {
                 correct++;
             else
                 error++;
-        }
+        }        
+        System.err.print("Sent: ");
+        for (int i = 0; i < real_vals.length; i ++){
+            System.err.print(sent_guesses[i]);
+            System.err.print(" ");}
+        System.err.println();
+        System.err.print("Gott: ");
+        for (int i = 0; i < real_vals.length; i ++){
+            System.err.print(real_vals[i]);
+            System.err.print(" ");}
+        System.err.println();
         System.err.print("Correct: ");
         System.err.print(correct);
         System.err.print(", Errors: ");
@@ -102,7 +124,7 @@ class Player {
 
         bird_guesser.manageRevelations(bird_manager.bird_models, pSpecies);
         // bird_guesser.printGrouping(bird_manager.bird_models, pSpecies);
-        // guessing_statistics(pSpecies);
+        guessing_statistics(pSpecies);
 
         endRound();
 
