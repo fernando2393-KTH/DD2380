@@ -6,10 +6,12 @@ import java.util.Iterator;
 class BirdGuesser {
     public ArrayList<BirdGroup> bird_groups;
 
-    public double MIN_RELATABLE = 0.9; // Minimum similarity to make them related
+    public double MIN_RELATABLE = 0.7; // Minimum similarity to make them related
+    // public double MIN_RELATABLE = -100; // Minimum similarity to make them related
 
     public int states;
     public int emissions;
+    public int total_bird_count = 0;
 
     // Constructor
     public BirdGuesser(int st, int emi) {
@@ -20,6 +22,7 @@ class BirdGuesser {
 
     public BirdGroup appendNewGroup(BirdModel bird) {
         BirdGroup bird_group = new BirdGroup(bird.species, states, emissions);
+        bird_group.bird_guesser = this;
         bird_group.appendBird(bird, true);
         bird_groups.add(bird_group);
         bird.groupDistance = 0;
@@ -59,7 +62,7 @@ class BirdGuesser {
     public void appendUnknownBird(BirdModel bird) {
         Pair<BirdGroup, Double> bird_group_info = getBirdGroup(bird);
         if (bird_group_info.first != null) { // If group close enough
-            bird_group_info.first.appendBird(bird, true);
+            bird_group_info.first.appendBird(bird, false);
             bird.groupDistance = bird_group_info.second;
         } else { // Create new group
             BirdGroup new_group = appendNewGroup(bird);

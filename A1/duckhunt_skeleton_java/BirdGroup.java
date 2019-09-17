@@ -11,6 +11,7 @@ class BirdGroup extends BirdModel {
 
     public ArrayList<BirdModel> birds_grouped;
     public static Map<Integer, BirdGroup> species_to_birdgroup = new HashMap<>();
+    public static BirdGuesser bird_guesser;
 
     public BirdGroup(int species_id, int st, int emi) {
         super(st, emi);
@@ -21,27 +22,58 @@ class BirdGroup extends BirdModel {
 
     // Updates general
     public void update() {
-        int num_birds = birds_grouped.size();
-        if (num_birds == 0)
+        if (birds_grouped.isEmpty())
             return;
-        double[][][] Aac = new double[num_birds][super.states][super.states];
-        double[][][] Bac = new double[num_birds][super.states][super.emissions];
-        double[][][] piac = new double[num_birds][1][super.states];
-        for (int k = 0; k < num_birds; k++)
-            for (int i = 0; i < super.states; ++i)
-                for (int j = 0; j < super.states; ++j)
-                    Aac[k][i][j] = birds_grouped.get(k).A[i][j];
-        for (int k = 0; k < num_birds; k++)
-            for (int i = 0; i < super.states; ++i)
-                for (int j = 0; j < super.emissions; ++j)
-                    Bac[k][i][j] = birds_grouped.get(k).B[i][j];
-        for (int k = 0; k < num_birds; k++)
-            for (int i = 0; i < super.states; ++i)
-                piac[k][0][i] = birds_grouped.get(k).pi[0][i];
+        super.A = birds_grouped.get(0).A;
+        super.B = birds_grouped.get(0).B;
+        super.pi = birds_grouped.get(0).pi;
+        updateObservations();
+        super.updateModel();
+        // int num_birds = birds_grouped.size();
+        // if (num_birds == 0)
+        //     return;
+        // double[][][] Aac = new double[num_birds][super.states][super.states];
+        // double[][][] Bac = new double[num_birds][super.states][super.emissions];
+        // double[][][] piac = new double[num_birds][1][super.states];
+        // for (int k = 0; k < num_birds; k++)
+        //     for (int i = 0; i < super.states; ++i)
+        //         for (int j = 0; j < super.states; ++j)
+        //             Aac[k][i][j] = birds_grouped.get(k).A[i][j];
+        // for (int k = 0; k < num_birds; k++)
+        //     for (int i = 0; i < super.states; ++i)
+        //         for (int j = 0; j < super.emissions; ++j)
+        //             Bac[k][i][j] = birds_grouped.get(k).B[i][j];
+        // for (int k = 0; k < num_birds; k++)
+        //     for (int i = 0; i < super.states; ++i)
+        //         piac[k][0][i] = birds_grouped.get(k).pi[0][i];
 
-        super.A = matrixOps.average(Aac);
-        super.B = matrixOps.average(Bac);
-        super.pi = matrixOps.average(piac);
+        // super.A = matrixOps.average(Aac);
+        // super.B = matrixOps.average(Bac);
+        // super.pi = matrixOps.average(piac);
+    }
+
+    public void updateObservations() {
+        // Count observations:
+        int total_obs_count = 0;
+        Iterator itr = birds_grouped.iterator();
+        while(itr.hasNext()) {
+            BirdModel bird = (BirdModel) itr.next();
+            total_obs_count += bird.observations.length;
+        }
+
+        super.observations = new int[total_obs_count];
+        Iterator itr2 = birds_grouped.iterator();
+        int i = 0;
+        while(itr2.hasNext()) {
+            BirdModel bird = (BirdModel) itr2.next();
+            for (int j = 0; j < bird.observations.length; j++) {
+                if (bird.observations[j] != -1)
+                    super.observations[i] = bird.observations[j];
+                i++;
+            }
+        }
+        // System.err.print("obs: ");
+        // System.err.println(super.observations.length);
     }
 
     // Appends bird to group
@@ -169,20 +201,39 @@ class BirdGroup extends BirdModel {
 
     // Returns minimal distance between 
     public double minimumDistance(BirdModel bird) {
-        double min = Double.POSITIVE_INFINITY;
-        Iterator itr = birds_grouped.iterator();
-        while (itr.hasNext()) {
-            BirdModel bm = (BirdModel) itr.next();
-            if (bm.species == species) {
-                double distance = bm.getDistance(bird);
-                if (distance < min) {
-                    min = distance;
-                }
-            }
-        }
-        return min;
+        // double min = Double.POSITIVE_INFINITY;
+        // Iterator itr = birds_grouped.iterator();
+        // int counter = 0;
+        // while (itr.hasNext()) {
+        //     BirdModel bm = (BirdModel) itr.next();
+        //     if (bm.species == species) {
+        //         double distance = bm.getDistance(bird);
+        //         if (distance < min) {
+        //             min = distance;
+        //         }
+        //         // if (counter > 20)
+        //         //     return min; 
+        //         // counter ++;
+        //     }
+        // }
+        // return min;
         // return birds_grouped.get(0).getDistance(bird);
-        // return super.getDistance(bird);
+        // double distance = super.getDistance(bird);
+
+        // double p_labda_o = super.obsLogProb(bird.observations);
+        double p_priori = 0;
+        if (bird_guesser.total_bird_count > 0 && birds_grouped.size() > 0) {
+            p_priori = Math.log((double) birds_grouped.size()/bird_guesser.total_bird_count);
+        }
+        // System.err.println(p_labda_o);
+        // return p_labda_o + p_priori;
+        // System.err.println(distance);
+        // printBirdInfo(true);
+        // birds_grouped.get(0).printBirdInfo(true);
+        // if (Double.isNaN(distance)) 
+        //     System.exit(0);
+        System.err.println(p_priori);
+        return super.getDistance(bird) - p_priori/100;
     }
 
 }

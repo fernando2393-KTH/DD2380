@@ -1,50 +1,52 @@
 class Player {
     public static final Action cDontShoot = new Action(-1, -1);
     private int timestep;
-    private BirdManager bird_manager;
-    private BirdGuesser bird_guesser;
+    // private BirdManager bird_manager;
+    // private BirdGuesser bird_guesser;
     private int[] sent_guesses;
 
     public static final int START_SHOOTING = 100;
 
     public Player() {
-        timestep = 0;
-        bird_manager = new BirdManager(3, 9);
-        bird_guesser = new BirdGuesser(3, 9);
+        // timestep = 0;
+        // bird_manager = new BirdManager(3, 9);
+        // bird_guesser = new BirdGuesser(3, 9);
     }
 
     // Methods to run once the round is finished
     private void startRound(GameState pState) {
-        bird_manager.start_round(pState.getNumBirds());
+        // bird_manager.start_round(pState.getNumBirds());
     }
 
     // Methods to run once the round is finished
-    private void endRound() {
-        timestep = 0;
-        bird_manager.finish_round();
+    private void endRound(GameState pState) {
+        // timestep = 0;
+        // bird_manager.finish_round();
+        // bird_guesser.total_bird_count += pState.getNumBirds();
     }
 
     public Action shoot(GameState pState, Deadline pDue) {
-        if (timestep == 0)
-            startRound(pState);
+        // if (timestep == 0)
+        //     startRound(pState);
         timestep += pState.getNumNewTurns(); // Update timestep count
 
-        bird_manager.updateBirdObss(pState);
+        // bird_manager.updateBirdObss(pState);
 
-        // Check if any bird died
-        for (int i = 0; i < pState.getNumBirds(); i++) {
-            Bird bird = pState.getBird(i);
-            // if (bird.getLastObservation() == -1) { // In case bird has just died
-            if (bird.isDead() && bird.wasAlive(timestep-2)) { // In case bird has just died
-                // System.err.println("Bird just died");
-                // System.err.print(bird.getObservation(timestep-2));
-                bird_manager.bird_models[i].updateModel();
-                // System.exit(0);
-            }
-        }
+        // // Check if any bird died
+        // for (int i = 0; i < pState.getNumBirds(); i++) {
+        //     Bird bird = pState.getBird(i);
+        //     // if (bird.getLastObservation() == -1) { // In case bird has just died
+        //     if (bird.isDead() && bird.wasAlive(timestep-2)) { // In case bird has just died
+        //         // System.err.println("Bird just died");
+        //         // System.err.print(bird.getObservation(timestep-2));
+        //         bird_manager.bird_models[i].updateModel();
+        //         // System.exit(0);
+        //     }
+        // }
 
-        if (timestep > 97)
-            bird_manager.updateBirdModels();
+        // if (timestep == 98) {
+        //     bird_manager.updateBirdModels();
+        // }
 
         // Lower the load at guessing
         // if (timestep >= 99 - pState.getNumBirds() && timestep < 99) {
@@ -64,8 +66,8 @@ class Player {
 
     public int[] guess(GameState pState, Deadline pDue) {
         // System.err.println("--------------------guessing: " + timestep);
-        sent_guesses = new int[pState.getNumBirds()];
-        sent_guesses = bird_guesser.getGuesses(bird_manager.bird_models);
+        // sent_guesses = new int[pState.getNumBirds()];
+        // sent_guesses = bird_guesser.getGuesses(bird_manager.bird_models);
         return sent_guesses;
     }
 
@@ -126,7 +128,7 @@ class Player {
         // bird_guesser.printGrouping(bird_manager.bird_models, pSpecies);
         guessing_statistics(pSpecies);
 
-        endRound();
+        endRound(pState);
 
         // if (pState.getRound() == 1)
         //     System.exit(0);

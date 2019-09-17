@@ -230,6 +230,8 @@ public class HMM {
                         di_gamma_sum += gamma[t][i];
                     }
                 }
+                if (di_gamma_sum == 0)
+                    di_gamma_sum = 1;
                 B[i][k] = di_gamma_sum / gamma_sum;
             }
         }

@@ -34,8 +34,8 @@ public class BirdModel extends HMM {
 
     //Updates confidence and A, B, pi from linked HMM
     public void updateModel() {
-        System.err.print("OBSs: ");
-        System.err.println(observations.length);
+        // System.err.print("OBSs: ");
+        // System.err.println(observations.length);
         confidence = super.baumWelch(observations);
     }
 
@@ -76,11 +76,12 @@ public class BirdModel extends HMM {
         System.err.print("Hash: ");
         System.err.print(this.hashCode());
         System.err.print("  Group: ");
-        System.err.print(group.hashCode());
+        if (group != null)
+            System.err.print(group.hashCode());
         System.err.print(", Species: ");
         System.err.print(species);
         System.err.print(", Conf:");
-        System.err.print(Math.round(confidence));
+        System.err.println(Math.round(confidence));
         // System.err.print(", OBSs:");
         // System.err.println(Arrays.toString(observations));
         if (print_matrices)
@@ -105,5 +106,9 @@ public class BirdModel extends HMM {
         // return -this_logprob;
         // System.err.println(Math.abs((original_logprob - this_logprob)/original_logprob));
         return Math.abs((original_logprob - this_logprob)/original_logprob);
+    }
+
+    public double bayes(int[] obss) {
+        super.obsLogProb(obss)
     }
 }
