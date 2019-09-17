@@ -6,10 +6,10 @@ class Player {
     private int timestep;
     private int[] sent_guesses;
 
-    public static final int STATES = 2;
+    public static final int STATES = 1;
     public static final double START_SHOOTING_TIMESTEP = 50;
-    public static final double START_SHOOTING_ROUND = 4;
-    public static final double SHOOT_THRESHOLD = 0.75;
+    public static final double START_SHOOTING_ROUND = 3;
+    public static final double SHOOT_THRESHOLD = 0.8;
     public static final Action cDontShoot = new Action(-1, -1);
 
     public Player() {
