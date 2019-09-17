@@ -108,7 +108,4 @@ public class BirdModel extends HMM {
         return Math.abs((original_logprob - this_logprob)/original_logprob);
     }
 
-    public double bayes(int[] obss) {
-        super.obsLogProb(obss)
-    }
 }

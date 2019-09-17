@@ -1,3 +1,4 @@
+
 // Class to enclose all matrix operations
 import java.awt.List;
 import java.io.BufferedReader;
@@ -8,7 +9,7 @@ import java.util.Arrays;
 public class matrixOps {
     // IO
     // Read matrix from console
-    public static double[][] read_matrix(BufferedReader reader) {        
+    public static double[][] read_matrix(BufferedReader reader) {
         String encoded_matrix;
         try {
             encoded_matrix = reader.readLine();
@@ -34,7 +35,7 @@ public class matrixOps {
             System.err.println("Could not read from System.in");
             return null;
         }
-        
+
         String[] splitted = encoded_matrix.split(" ");
         int length = Integer.parseInt(splitted[0]);
         int[] vector = new int[length];
@@ -42,13 +43,13 @@ public class matrixOps {
             vector[i] = Integer.parseInt(splitted[i + 1]);
         return vector;
     }
-    
+
     // Given a console line, returns the encoded matrix
     public static void print_matrix(double[][] mat) {
-        System.err.print(mat.length);  // Print rows
+        System.err.print(mat.length); // Print rows
         System.err.print(" ");
-        System.err.print(mat[0].length);  // Print cols
-        System.err.println();  // Print cols
+        System.err.print(mat[0].length); // Print cols
+        System.err.println(); // Print cols
         for (int i = 0; i < mat.length; i++) {
             for (int j = 0; j < mat[0].length; j++) {
                 System.err.print(" ");
@@ -62,29 +63,29 @@ public class matrixOps {
 
     // Given a console line, returns the encoded matrix
     public static void print_vector(double[] mat) {
-        System.err.print(mat.length);  // Print rows
+        System.err.print(mat.length); // Print rows
         System.err.print(": ");
-        System.err.println();  // Print cols
+        System.err.println(); // Print cols
         for (int i = 0; i < mat.length; i++) {
-                System.err.print(" ");
-                double roundOff = Math.round(mat[i] * 10000.0) / 10000.0;
-                System.err.print(roundOff);
-            }
-            System.err.println();
+            System.err.print(" ");
+            double roundOff = Math.round(mat[i] * 10000.0) / 10000.0;
+            System.err.print(roundOff);
+        }
+        System.err.println();
     }
 
     // Given a console line, returns the encoded matrix
     public static void print_matrix_as_row(double[][] mat) {
-        System.err.print(mat.length);  // Print rows
+        System.err.print(mat.length); // Print rows
         System.err.print(" ");
-        System.err.print(mat[0].length);  // Print cols
+        System.err.print(mat[0].length); // Print cols
         for (int i = 0; i < mat.length; i++) {
             for (int j = 0; j < mat[0].length; j++) {
                 System.err.print(" ");
                 System.err.print(mat[i][j]);
             }
         }
-        System.err.println();    
+        System.err.println();
     }
 
     // ARITHMETIC
@@ -101,13 +102,14 @@ public class matrixOps {
         for (int i = 0; i < rows_a; i++)
             for (int j = 0; j < cols_b; j++) {
                 sum = 0;
-                for (int k = 0; k < cols_a; k++) sum += mat_a[i][k]*mat_b[k][j];
+                for (int k = 0; k < cols_a; k++)
+                    sum += mat_a[i][k] * mat_b[k][j];
                 result[i][j] = sum;
             }
         return result;
     }
 
-    // given a vector, a matrix and  a col_id, returns vector of element-wise
+    // given a vector, a matrix and a col_id, returns vector of element-wise
     // multiplication of vector values and given column (useful at forward alg)
     public static double[][] vector_col_elem_wise_mult(double[][] vect, double[][] mat, int col) {
         int rows_mat = mat.length;
@@ -116,11 +118,11 @@ public class matrixOps {
             return null;
         double[][] result = new double[1][cols_vect];
         for (int i = 0; i < cols_vect; i++)
-            result[0][i] = vect[0][i]*mat[i][col];
+            result[0][i] = vect[0][i] * mat[i][col];
         return result;
     }
 
-    public static Pair<Double, Integer> maxVectorMatrixCol(double [][] vector, double [][] matrix, int col){
+    public static Pair<Double, Integer> maxVectorMatrixCol(double[][] vector, double[][] matrix, int col) {
 
         int rows_mat = matrix.length;
         int cols_vect = vector[0].length;
@@ -129,16 +131,16 @@ public class matrixOps {
 
         double maximum = -1;
         int max_position = -1;
-        for(int i = 0;  i < vector[0].length; i++){
+        for (int i = 0; i < vector[0].length; i++) {
             double value = vector[0][i] * matrix[i][col];
-            if(value > maximum){
+            if (value > maximum) {
                 maximum = value;
                 max_position = i;
-                //max_positions.clear();
-                //max_positions.add(i);
+                // max_positions.clear();
+                // max_positions.add(i);
             }
             // else if(value == maximum) {
-            //     max_positions.add(i);
+            // max_positions.add(i);
             // }
         }
 
@@ -182,7 +184,7 @@ public class matrixOps {
         for (int k = 0; k < matrices_num; k++)
             for (int i = 0; i < rows; ++i)
                 for (int j = 0; j < cols; ++j)
-                    solution[i][j] += matrices[k][i][j]/matrices_num;
+                    solution[i][j] += matrices[k][i][j] / matrices_num;
         return solution;
     }
 
@@ -193,16 +195,15 @@ public class matrixOps {
         double[][] solution = new double[rows][cols];
         for (int i = 0; i < rows; ++i)
             for (int j = 0; j < cols; ++j)
-                solution[i][j] = (A[i][j] + B[i][j])/matrices_num;
+                solution[i][j] = (A[i][j] + B[i][j]) / matrices_num;
         return solution;
     }
 
-    
     // OTHER
     // public static int[] push(int[] arr, int item) {
-    //     int[] tmp = Arrays.copyOf(arr, arr.length + 1);
-    //     tmp[tmp.length - 1] = item;
-    //     return tmp;
+    // int[] tmp = Arrays.copyOf(arr, arr.length + 1);
+    // tmp[tmp.length - 1] = item;
+    // return tmp;
     // }
 
     public static int[] push(int[] arr, int item) {
@@ -218,19 +219,19 @@ public class matrixOps {
     }
 
     // Returns random array that adds up to 1
-    public static  double[] randomArray(int length, int enhance) {
+    public static double[] randomArray(int length, int enhance) {
         double[] vector = new double[length];
         // Generate random values
         double sum = 0;
         for (int i = 0; i < length; i++) {
-            vector[i] = Math.random();            
+            vector[i] = Math.random();
             if (i == enhance) // Makes diagonal elements higher to avoid bad conditioning
-                vector[i] = 4*Math.random();
+                vector[i] = 4 * Math.random();
             sum += vector[i];
         }
         // Divide each element by sum
         for (int i = 0; i < length; i++) {
-            vector[i] = vector[i]/sum;
+            vector[i] = vector[i] / sum;
         }
         return vector;
     }
@@ -240,12 +241,23 @@ public class matrixOps {
         double[][] matrix = new double[size_x][size_y];
         for (int i = 0; i < size_x; i++) {
             double[] row_values;
-            if (enhance) row_values = randomArray(size_y, i);
-            else row_values = randomArray(size_y, -1);
+            if (enhance)
+                row_values = randomArray(size_y, i);
+            else
+                row_values = randomArray(size_y, -1);
             for (int j = 0; j < size_y; j++) {
                 matrix[i][j] = row_values[j];
             }
         }
         return matrix;
+    }
+
+    // Given a matrix, copies it into another one
+    public static void copy_matrix(double[][] o, double[][] d) {
+        for (int i = 0; i < o.length; i++) {
+            for (int j = 0; j < o[0].length; j++) {
+                d[i][j] = o[i][j];
+            }
+        }
     }
 }

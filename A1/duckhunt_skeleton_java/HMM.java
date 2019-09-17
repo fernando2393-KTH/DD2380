@@ -18,6 +18,14 @@ public class HMM {
     public final int ITERATION_LIMIT = 1000;
     public final double LOG_NON_IMPROVEMENT = 0.01;
 
+    public void init(int st, int emi) {
+        states = st;
+        emissions = emi;
+        A = new double[states][states];
+        B = new double[states][emissions];
+        pi = new double[1][states];
+    }
+
     // Reads values from console and populates A, B, pi
     public void read_hmm(BufferedReader reader) {
         A = matrixOps.read_matrix(reader);
@@ -142,6 +150,48 @@ public class HMM {
         result[observations.length - 1] = maximum_position;
         for (int i = observations.length - 2; i > -1; i--) {
             result[i] = path[result[i + 1]][i + 1];
+        }
+        return result;
+    }
+
+    public Pair<Integer, Double> nextEmissionGivenObs(int[] observations) {
+        double[][] delta = new double[1][pi[0].length];
+        double[][] deltaPrev = matrixOps.vector_col_elem_wise_mult(pi, B, observations[0]);
+        for (int i = 1; i < observations.length; i++) { // Per observation
+            for (int j = 0; j < pi[0].length; j++) { // Per state
+                Pair<Double, Integer> max_pair = matrixOps.maxVectorMatrixCol(deltaPrev, A, j);
+                delta[0][j] = max_pair.first * B[j][observations[i]];
+            }
+
+            deltaPrev = delta; // Update delta
+        }
+
+        // double maximum = -1;
+        // int maximum_position = -1;
+        // for (int i = 0; i < deltaPrev[0].length; i++) {
+        //     if (deltaPrev[0][i] > maximum) {
+        //         maximum = deltaPrev[0][i];
+        //         maximum_position = i;
+        //     }
+        // }
+        double sum = 0;
+        for (int i = 0; i < delta[0].length; i++) {
+            sum += delta[0][i];
+        }
+        for (int i = 0; i < delta[0].length; i++) {
+            delta[0][i] = delta[0][i]/sum;
+        }
+        double[][] state_prob = matrixOps.multiply(delta, A);
+        double[][] emission_prob = matrixOps.multiply(state_prob, B);
+
+        Pair<Integer, Double> result = new Pair();
+        result.first = 0;
+        result.second = emission_prob[0][0];
+        for (int i = 1; i < emissions; i++) {
+            if (emission_prob[0][i] > result.second) {
+                result.first = i;
+                result.second = emission_prob[0][i];
+            }
         }
         return result;
     }
