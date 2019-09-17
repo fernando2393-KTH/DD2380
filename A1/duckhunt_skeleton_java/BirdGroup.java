@@ -44,6 +44,35 @@ class BirdGroup extends BirdModel {
         super.pi = matrixOps.average(piac);
     }
 
+    public void updateObservations() {
+        // Count observations:
+        int total_obs_count = 0;
+        Iterator itr = birds_grouped.iterator();
+        while(itr.hasNext()) {
+            BirdModel bird = (BirdModel) itr.next();
+            total_obs_count += bird.observations.length;
+        }
+
+        super.observations = new int[total_obs_count];
+        Iterator itr2 = birds_grouped.iterator();
+        int i = 0;
+        while(itr2.hasNext()) {
+            BirdModel bird = (BirdModel) itr2.next();
+            for (int j = 0; j < bird.observations.length; j++) {
+                if (bird.observations[j] != -1)
+                    super.observations[i] = bird.observations[j];
+                i++;
+            }
+        }
+    }
+
+    // Updates general
+    public void update2() {
+        update();
+        updateObservations();
+        super.updateModel();
+    }
+
     // Appends bird to group
     public void appendBird(BirdModel bird, boolean update_model) {
         // If bird already in this group
@@ -169,20 +198,27 @@ class BirdGroup extends BirdModel {
 
     // Returns minimal distance between 
     public double minimumDistance(BirdModel bird) {
-        // double min = Double.POSITIVE_INFINITY;
-        // Iterator itr = birds_grouped.iterator();
-        // while (itr.hasNext()) {
-        //     BirdModel bm = (BirdModel) itr.next();
-        //         if (bm.species == species) {
-        //         double distance = bm.getDistance(bird);
-        //         if (distance < min) {
-        //             min = distance;
-        //         }
-        //     }
-        // }
-        // return min;
+        double min = Double.POSITIVE_INFINITY;
+        Iterator itr = birds_grouped.iterator();
+        int bird_num = birds_grouped.size();
+        while (itr.hasNext()) {
+            BirdModel bm = (BirdModel) itr.next();
+                if (bm.species == species) {
+                double distance = bm.getDistance(bird);
+                // if (!Double.isNaN(distance))
+                if (distance < min)
+                    min = distance;
+            }
+        }
+        System.err.println(min);
+        // if (Double.isNaN(average))
+        //     System.exit(0);
+        return min;
         // return birds_grouped.get(0).getDistance(bird);
-        return super.getDistance(bird);
+        
+        // Double distance = super.getDistance(bird);
+        // System.err.println(distance);
+        // return distance;
     }
 
 }

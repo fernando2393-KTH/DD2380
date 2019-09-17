@@ -6,7 +6,7 @@ import java.util.Iterator;
 class BirdGuesser {
     public ArrayList<BirdGroup> bird_groups;
 
-    public double MIN_RELATABLE = 200; // Minimum similarity to make them related
+    public double MIN_RELATABLE = 70; // Minimum similarity to make them related
 
     public int states;
     public int emissions;
@@ -133,6 +133,11 @@ class BirdGuesser {
 
             // Save bird species
             bird.species = real_species;
+            if (bird.species == -1) {// If unknown, remove
+                if (bird.group != null) {
+                    bird.group.removeBird(bird, true);
+                }
+            }
             if (bird_group == null) { // Case bird didnt have group (shouldnt happen)
                 appendKnownBird(bird, real_species);
                 continue;

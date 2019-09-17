@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 // Sorts birds by most likely
 // Groups birds by similarity and tests 
 public class BirdManager {
@@ -28,12 +30,24 @@ public class BirdManager {
         return;
     }
 
+    private int [] getBirdObservations(Bird bird) {
+        int[] bird_observations = new int[bird.getSeqLength()];
+        for (int i = 0; i < bird.getSeqLength(); i++) {
+            bird_observations[i] = bird.getObservation(i);
+            if (bird_observations[i] == -1) {
+                // System.err.println("Early returning");
+                return Arrays.copyOfRange(bird_observations, 0, i-1);
+            }
+        }
+        return bird_observations;
+    }
+
     public void updateBirdObss(GameState pState) {
         for (int i = 0; i < bird_models.length; i++) {
             Bird bird = pState.getBird(i);
-            if (bird.isAlive() && bird.getLastObservation() != -1) {
-                bird_models[i].addObservation(bird.getLastObservation());
-            }
+            // if (bird.isAlive()) {
+                bird_models[i].observations = getBirdObservations(bird);
+            // }
         }
     }
 

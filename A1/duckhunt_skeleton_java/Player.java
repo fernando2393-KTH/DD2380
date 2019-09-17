@@ -9,8 +9,8 @@ class Player {
 
     public Player() {
         timestep = 0;
-        bird_manager = new BirdManager(2, 9);
-        bird_guesser = new BirdGuesser(2, 9);
+        bird_manager = new BirdManager(3, 9);
+        bird_guesser = new BirdGuesser(3, 9);
     }
 
     // Methods to run once the round is finished
@@ -32,12 +32,18 @@ class Player {
         bird_manager.updateBirdObss(pState);
 
         // Lower the load at guessing
-        if (timestep >= 99 - pState.getNumBirds() && timestep < 99) {
-            int pos = timestep - 99 + pState.getNumBirds();
-            BirdModel birdmodel = bird_manager.bird_models[pos];
-            birdmodel.updateModel();
-            bird_guesser.appendUnknownBird(birdmodel);
-        }
+        // if (timestep >= 99 - pState.getNumBirds() && timestep < 99) {
+        //     int pos = timestep - 99 + pState.getNumBirds();
+        //     BirdModel birdmodel = bird_manager.bird_models[pos];
+        //     birdmodel.updateModel();
+        //     bird_guesser.appendUnknownBird(birdmodel);
+        // }
+        if (timestep == 98)
+            for (int i = 0; i < bird_manager.bird_models.length; i++) {
+                BirdModel birdmodel = bird_manager.bird_models[i];
+                birdmodel.updateModel();
+                bird_guesser.appendUnknownBird(birdmodel);
+            }
 
         if (timestep < START_SHOOTING)
             return cDontShoot;
@@ -99,6 +105,12 @@ class Player {
      */
     public void reveal(GameState pState, int[] pSpecies, Deadline pDue) {
         // System.err.println("--------------------revealing: ");
+
+        for (int i = 0; i < pSpecies.length; i ++) {
+            System.err.print(pSpecies[i]);
+            System.err.print(" ");
+        }
+        System.err.println();
 
         bird_guesser.manageRevelations(bird_manager.bird_models, pSpecies);
         // bird_guesser.printGrouping(bird_manager.bird_models, pSpecies);

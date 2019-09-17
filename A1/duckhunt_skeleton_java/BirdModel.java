@@ -29,20 +29,25 @@ public class BirdModel extends HMM {
 
     // Append an observation to BirdModel observations
     public void addObservation(int obs) {
-        observations = matrixOps.push(observations, obs);
+        if (obs != -1)
+            observations = matrixOps.push(observations, obs);
     }
 
     //Updates confidence and A, B, pi from linked HMM
     public void updateModel() {
-        confidence = super.baumWelch(observations);
+        if (observations.length > 0)
+            confidence = super.baumWelch(observations);
     }
 
     public void updateModelDebug() {
-        confidence = super.baumWelchDebug(observations);
+        if (observations.length > 0)
+            confidence = super.baumWelchDebug(observations);
     }
     
     // Predicts bird's next movement
     public int predictMovement() {
+        if (observations.length < 1)
+            return 0;
         int T = observations.length;
 
         // This is VEEERY improvable
@@ -87,6 +92,11 @@ public class BirdModel extends HMM {
 
     // Given another BirdModel returns the difference among them
     public double getDistance(BirdModel bird) {
-        return -super.obsLogProb(bird.observations);
+        if (bird.observations.length < 1)
+            return Double.POSITIVE_INFINITY;
+        double log_prob = -super.obsLogProb(bird.observations);
+        // if (Double.isNaN(log_prob))
+        //     return Double.POSITIVE_INFINITY;
+        return log_prob;
     }
 }
