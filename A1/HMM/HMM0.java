@@ -4,9 +4,11 @@ import java.io.InputStreamReader;
 public class HMM0 { 
     public static void main(String[] args) {
 
+        HMM hmm = new HMM();
+
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        HMM.read_hmm(reader);
+        hmm.read_hmm(reader);
 
         try {
             reader.close();
@@ -15,6 +17,6 @@ public class HMM0 {
         }
         
 
-        HMM.next_emission();
+        hmm.next_emission();
     } 
 } 

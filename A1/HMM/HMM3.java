@@ -5,10 +5,13 @@ import java.io.InputStreamReader;
 
 public class HMM3 {
     public static void main(String[] args) {
+
+        HMM hmm = new HMM();
+
         // Reader to read from terminal
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        HMM.read_hmm(reader);
+        hmm.read_hmm(reader);
 
         int [] obs = matrixOps.read_vector(reader);
 
@@ -18,9 +21,9 @@ public class HMM3 {
             System.err.println(e);
         }
 
-        HMM.baumWelch(obs);
+        hmm.baumWelch(obs);
         //HMM.print_hmm();
-        matrixOps.print_matrix_as_row(HMM.A);
-        matrixOps.print_matrix_as_row(HMM.B);
+        matrixOps.print_matrix_as_row(hmm.A);
+        matrixOps.print_matrix_as_row(hmm.B);
     }
 }

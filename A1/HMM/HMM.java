@@ -9,17 +9,17 @@ import java.lang.Math;
 
 public class HMM {
     // PUBLIC
-    static double[][] A;
-    static double[][] B;
-    static double[][] pi;
-    static int states;
-    static int emissions;
+    double[][] A;
+    double[][] B;
+    double[][] pi;
+    int states;
+    int emissions;
 
-    public static final int ITERATION_LIMIT = 7;
+    public static final int ITERATION_LIMIT = 1000;
     public static final double LOG_NON_IMPROVEMENT = 0.01;
 
     // Reads values from console and populates A, B, pi
-    public static void read_hmm(BufferedReader reader) {
+    public void read_hmm(BufferedReader reader) {
         A = matrixOps.read_matrix(reader);
         B = matrixOps.read_matrix(reader);
         pi = matrixOps.read_matrix(reader);
@@ -27,17 +27,25 @@ public class HMM {
         emissions = B[0].length;
     }
 
+    public void assignValues(double[][] a, double[][] b, double[][] p) {
+        A = a;
+        B = b;
+        pi = p;
+        states = A.length;
+        emissions = B[0].length;
+    }
+
     // Starts h,, with random values
-    public static void randomInit(int st, int emi) {
+    public void randomInit(int st, int emi) {
+        states = st;
+        emissions = emi;
         A = matrixOps.randomMatrix(states, states, true);
         B = matrixOps.randomMatrix(states, emissions, true);
         pi = matrixOps.randomMatrix(1, states, false);
-        states = st;
-        emissions = emi;
     }
 
     // Reads values from console and populates A, B, pi
-    public static void print_hmm() {
+    public void print_hmm() {
         System.out.println("A:");
         System.out.println(Arrays.deepToString(A));
         System.out.println("B:");
@@ -46,8 +54,9 @@ public class HMM {
         System.out.println(Arrays.deepToString(pi));
     }
 
+
     // Returns next emission probability
-    public static void next_emission() {
+    public void next_emission() {
         double[][] state_prob = matrixOps.multiply(pi, A);
         double[][] emission_prob = matrixOps.multiply(state_prob, B);
         matrixOps.print_matrix(emission_prob);
@@ -55,7 +64,7 @@ public class HMM {
 
     // Uses forward algorithm to compute probability of
     // a given sequence of observations
-    public static Pair<double[][], double[]> fwdAlgorithm(int[] observations) {
+    public Pair<double[][], double[]> fwdAlgorithm(int[] observations) {
         int T = observations.length;
         double[][] alpha = new double[states][T]; // Matrix of all computed alphas
         double[] norm_ctes = new double[T];
@@ -94,8 +103,19 @@ public class HMM {
         return result;
     }
 
+    public double obsLogProb(int[] observations) {
+        Pair<double[][], double[]> alpha_info = fwdAlgorithm(observations);
+        double[] ctes = alpha_info.second;
+
+        double cte = 0;
+        for (int i = 0; i < ctes.length; i++) {
+            cte -= Math.log(ctes[i]);
+        }
+        return cte;
+    }
+
     /* Uses backward algorithm to compute the sequence of betas */
-    public static double[][] bkwAlgorithm(int[] observations, double[] norm_ctes) {
+    public double[][] bkwAlgorithm(int[] observations, double[] norm_ctes) {
         int T = observations.length;
         double[][] beta = new double[states][T];
 
@@ -120,7 +140,7 @@ public class HMM {
 
     // Uses viterbi algorithm to compute the most likely sequence
     // given a set of observations
-    public static int[] viterbiAlgorithm(int[] observations) {
+    public int[] viterbiAlgorithm(int[] observations) {
 
         int[] result = new int[observations.length];
         int[][] path = new int[pi[0].length][observations.length]; // Array of possible combinations per time
@@ -154,7 +174,7 @@ public class HMM {
         return result;
     }
 
-    public static void updateHMM(int[] observations) {
+    public void updateHMM(int[] observations) {
         int T = observations.length;
 
         // Forward pass
@@ -232,7 +252,7 @@ public class HMM {
         }
     }
 
-    public static double baumWelch(int[] observations) {
+    public double baumWelch(int[] observations) {
         int iterations = 0;
         double log_prob_ant = - (LOG_NON_IMPROVEMENT + 1);
         double log_prob = 0;
@@ -257,7 +277,7 @@ public class HMM {
     }
 
     // Does baum-welch and returns iterations and final log(prob) to build graphs
-    public static Pair<Double, Double> baumWelchWithDetails(int[] observations) {
+    public Pair<Double, Integer> baumWelchWithDetails(int[] observations) {
         int iterations = 0;
         double log_prob_ant = - (LOG_NON_IMPROVEMENT + 1);
         double log_prob = 0;
@@ -278,7 +298,7 @@ public class HMM {
                 log_prob_ant = log_prob - (LOG_NON_IMPROVEMENT + 1);
             iterations++;
         }
-        Pair<Double, Double> summary = new Pair<Double, Double>();
+        Pair<Double, Integer> summary = new Pair<Double, Integer>();
         summary.first = log_prob;
         summary.second = iterations;
         return summary;

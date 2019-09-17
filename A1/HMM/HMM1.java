@@ -4,9 +4,11 @@ import java.io.InputStreamReader;
 public class HMM1 { 
     public static void main(String[] args) {
 
+        HMM hmm = new HMM();
+
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        HMM.read_hmm(reader);
+        hmm.read_hmm(reader);
 
         int [] obs = matrixOps.read_vector(reader);
 
@@ -16,7 +18,7 @@ public class HMM1 {
             System.err.println(e);
         }
 
-        Pair<double[][], double[]> alpha_info = HMM.fwdAlgorithm(obs);
+        Pair<double[][], double[]> alpha_info = hmm.fwdAlgorithm(obs);
         double[] ctes = alpha_info.second;
 
         double cte = 1;
