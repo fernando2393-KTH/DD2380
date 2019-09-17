@@ -10,7 +10,7 @@ class Player {
     public static final double START_SHOOTING_TIMESTEP = 60;
     public static final double START_SHOOTING_ROUND = 4;
     public static final double SHOOT_THRESHOLD = 0.8;
-    public static final int USE_BAYES_ROUND = 3;
+    public static final int USE_BAYES_ROUND = 100;
     public static final Action cDontShoot = new Action(-1, -1);
 
     public Player() {
@@ -56,8 +56,8 @@ class Player {
     public Action shoot(GameState pState, Deadline pDue) {
         timestep += pState.getNumNewTurns(); // Update timestep count
         boolean use_bayes = false;
-        if (timestep == 1)
-            use_bayes = allSpecies() && (pState.getRound() > 3);
+        if (timestep > 1)
+            use_bayes = allSpecies() && (pState.getRound() > USE_BAYES_ROUND);
 
 
         if (timestep > START_SHOOTING_TIMESTEP && pState.getRound() > START_SHOOTING_ROUND) {
