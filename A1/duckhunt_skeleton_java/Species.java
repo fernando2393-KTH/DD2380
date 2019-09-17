@@ -42,15 +42,15 @@ public class Species extends HMM {
     }
 
     // Returns Bayes logprob
-    public double getProb(int[] obss) {
+    public double getProb(int[] obss, boolean use_bayes) {
         // IDEA: P(lambda|obs) = P(obs|lambda)*P(lambda)/P(obs)
         // EQUIVALENT = log(P(obs|lambda)) + log(P(lambda))
-        if (bird_num == 0 || total_bird_num == 0)
-            return -1e6;
         double obs_lambda = super.obsLogProb(obss);
-        double p_lamda = Math.log(bird_num/total_bird_num);
+        if (use_bayes) {
+            double p_lamda = Math.log(bird_num/total_bird_num);
+            return obs_lambda + p_lamda;
+        }
         return obs_lambda;
-        // return obs_lambda;
     }
 
     public Pair<Integer, Double> nextMovement(int[] obss) {

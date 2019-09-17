@@ -7,9 +7,10 @@ class Player {
     private int[] sent_guesses;
 
     public static final int STATES = 1;
-    public static final double START_SHOOTING_TIMESTEP = 50;
-    public static final double START_SHOOTING_ROUND = 3;
+    public static final double START_SHOOTING_TIMESTEP = 60;
+    public static final double START_SHOOTING_ROUND = 4;
     public static final double SHOOT_THRESHOLD = 0.8;
+    public static final int USE_BAYES_ROUND = 3;
     public static final Action cDontShoot = new Action(-1, -1);
 
     public Player() {
@@ -30,11 +31,11 @@ class Player {
         return bird_observations;
     }
 
-    private int mostLikelySpecies(int[] obss) {
+    private int mostLikelySpecies(int[] obss, boolean use_bayes){
         double max = Double.NEGATIVE_INFINITY;
         int max_pos = -1;
         for (int j = 0; j < species.length; j++) {
-            double value = species[j].getProb(obss);
+            double value = species[j].getProb(obss, use_bayes);
             if (value > max) {
                 max = value;
                 max_pos = j;
@@ -43,8 +44,21 @@ class Player {
         return max_pos;
     }
 
+    // Retruns true if all species have birds
+    private boolean allSpecies() {
+        for (int i = 0; i < species.length; i++) {
+            if (species[i].bird_num == 0)
+                return false;
+        }
+        return true;
+    }
+
     public Action shoot(GameState pState, Deadline pDue) {
         timestep += pState.getNumNewTurns(); // Update timestep count
+        boolean use_bayes = false;
+        if (timestep == 1)
+            use_bayes = allSpecies() && (pState.getRound() > 3);
+
 
         if (timestep > START_SHOOTING_TIMESTEP && pState.getRound() > START_SHOOTING_ROUND) {
             int num_birds = pState.getNumBirds();
@@ -55,7 +69,7 @@ class Player {
 
                 // 1. Identify black stork
                 int[] obss = getBirdObservations(pState.getBird(i));
-                int bird_species = mostLikelySpecies(obss);
+                int bird_species = mostLikelySpecies(obss, use_bayes);
                 if (bird_species == Constants.SPECIES_BLACK_STORK) {
                     continue;
                 }
@@ -87,11 +101,13 @@ class Player {
     public int[] guess(GameState pState, Deadline pDue) {
         int birds_num = pState.getNumBirds();
         sent_guesses = new int[birds_num];
+        boolean use_bayes = allSpecies() && (pState.getRound() > 3);
+
 
         for (int i = 0; i < birds_num; i++) {
             Bird bird = pState.getBird(i);
             int[] obss = getBirdObservations(bird);
-            sent_guesses[i] = mostLikelySpecies(obss); // Find closest species
+            sent_guesses[i] = mostLikelySpecies(obss, use_bayes); // Find closest species
         }
         return sent_guesses;
     }
