@@ -8,9 +8,9 @@ class Player {
 
     public static final int SHOOTING_STATES = 2;
     public static final int GUESSING_STATES = 1;
-    public static final double START_SHOOTING_TIMESTEP = 60;
+    public static final double START_SHOOTING_TIMESTEP = 70;
     public static final double START_SHOOTING_ROUND = 5;
-    public static final double SHOOT_THRESHOLD = 0.7;
+    public static final double SHOOT_THRESHOLD = 0.8;
     public static final double USE_BAYES_ROUND = 3;
     public static final Action cDontShoot = new Action(-1, -1);
 

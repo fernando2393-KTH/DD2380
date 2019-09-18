@@ -46,19 +46,19 @@ public class Species {
         // IDEA: P(lambda|obs) = P(obs|lambda)*P(lambda)/P(obs)
         // EQUIVALENT = log(P(obs|lambda)) + log(P(lambda))
         double obs_lambda = guessing_model.obsLogProb(obss);
-        if (use_bayes && bird_num > 0) {
-            double p_lamda = Math.log(((double) bird_num)/((double) total_bird_num));
-            return obs_lambda + p_lamda;
-        }
+        // if (use_bayes && bird_num > 0) {
+        //     double p_lamda = Math.log(((double) bird_num)/((double) total_bird_num));
+        //     return obs_lambda + p_lamda;
+        // }
         return obs_lambda;
     }
 
     public Pair<Integer, Double> nextMovement(int[] obss) {
         // Deepcopy species shooting model
         HMM custom_bird_hmm = new HMM(shooting_model.states, shooting_model.emissions);
-        custom_bird_hmm.A = matrixOps.get_matrix(shooting_model.A);
-        custom_bird_hmm.B = matrixOps.get_matrix(shooting_model.B);
-        custom_bird_hmm.pi = matrixOps.get_matrix(shooting_model.pi);
+        // custom_bird_hmm.A = matrixOps.get_matrix(shooting_model.A);
+        // custom_bird_hmm.B = matrixOps.get_matrix(shooting_model.B);
+        // custom_bird_hmm.pi = matrixOps.get_matrix(shooting_model.pi);
         // Fine-tune with given obss
         // shooting_model.print_hmm();
         // custom_bird_hmm.print_hmm();
@@ -66,7 +66,8 @@ public class Species {
         // custom_bird_hmm.print_hmm();
         // System.exit(0);
         // return custom_bird_hmm.nextEmissionGivenObs(obss);
-        return custom_bird_hmm.nextEmissionGivenObs(obss);
+        // return custom_bird_hmm.nextEmissionGivenObs(obss);
+        return custom_bird_hmm.nextMove(obss);
     }
 
     public void printSpecies() {

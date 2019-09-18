@@ -16,7 +16,7 @@ public class HMM {
     int emissions;
 
     public final int ITERATION_LIMIT = 1000;
-    public final double LOG_NON_IMPROVEMENT = 0.01;
+    public final double LOG_NON_IMPROVEMENT = 0.001;
 
     public HMM(int st, int emi) {
         states = st;
@@ -166,14 +166,6 @@ public class HMM {
             deltaPrev = delta; // Update delta
         }
 
-        // double maximum = -1;
-        // int maximum_position = -1;
-        // for (int i = 0; i < deltaPrev[0].length; i++) {
-        //     if (deltaPrev[0][i] > maximum) {
-        //         maximum = deltaPrev[0][i];
-        //         maximum_position = i;
-        //     }
-        // }
         double sum = 0;
         for (int i = 0; i < delta[0].length; i++) {
             sum += delta[0][i];
@@ -181,6 +173,17 @@ public class HMM {
         for (int i = 0; i < delta[0].length; i++) {
             delta[0][i] = delta[0][i]/sum;
         }
+        // double max = Double.NEGATIVE_INFINITY;
+        // int max_pos = -1;
+        // for (int i = 0; i < delta[0].length; i++) {
+        //     if (delta[0][i] > max) {
+        //         max = delta[0][i];
+        //         max_pos = i;
+        //     }
+        // }
+        // double[][] most_likely_state = new double[1][delta[0].length];
+        // most_likely_state[0][max_pos] = 1;
+
         double[][] state_prob = matrixOps.multiply(delta, A);
         double[][] emission_prob = matrixOps.multiply(state_prob, B);
 
@@ -195,6 +198,49 @@ public class HMM {
         }
         return result;
     }
+
+
+    // Returns prob of observing i in next observation
+    public double probObsi(Pair<double[][], double[]> alpha_info, int obs_k) {
+        
+        // double cte = 1;
+        // for (int i = 0; i < alpha_info.second.length; i++) {
+        //     cte = cte*alpha_info.second[i];
+        // }
+
+        double sum = 0;
+        for (int k = 0; k < states; k++) {
+            double sum2 = 0;
+            for (int h = 0; h < states; h++) {
+                sum2 += A[h][k]*alpha_info.first[h][alpha_info.first[0].length-1];
+            }
+            sum += sum2*B[k][obs_k];
+        }
+        return sum;
+    }
+
+    public Pair<Integer, Double> nextMove(int[] obss){
+        Pair<double[][], double[]> alpha_info = fwdAlgorithm(obss);
+        
+        double[][] current_state = new double[1][states];
+        for (int i = 0; i < states; i++) {
+            current_state[0][i] = alpha_info.first[i][alpha_info.first[0].length-1];
+        }
+        double[][] state_prob = matrixOps.multiply(current_state, A);
+        double[][] emission_prob = matrixOps.multiply(state_prob, B);
+
+        Pair<Integer, Double> result = new Pair();
+        result.first = -1;
+        result.second = Double.NEGATIVE_INFINITY;
+        for (int i = 0; i < emissions; i++) {
+            if (emission_prob[0][i] > result.second) {
+                result.first = i;
+                result.second = emission_prob[0][i];
+            }
+        }
+        return result;
+    }
+
 
     // TODO(oleguer): optimize this, compute online log_c and dont store all alpha
     public double obsLogProb(int[] observations) {
