@@ -7,9 +7,9 @@ class Player {
     private int[] sent_guesses;
 
     public static final int STATES = 1;
-    public static final double START_SHOOTING_TIMESTEP = 50;
-    public static final double START_SHOOTING_ROUND = 3;
-    public static final double SHOOT_THRESHOLD = 0.8;
+    public static final double START_SHOOTING_TIMESTEP = 60;
+    public static final double START_SHOOTING_ROUND = 4;
+    public static final double SHOOT_THRESHOLD = 0.60;
     public static final Action cDontShoot = new Action(-1, -1);
 
     public Player() {
@@ -53,31 +53,35 @@ class Player {
             int bird_to_shoot = -1;
             for (int i = 0; i < num_birds; i++) {
 
-                // 1. Identify black stork
-                int[] obss = getBirdObservations(pState.getBird(i));
-                int bird_species = mostLikelySpecies(obss);
-                if (bird_species == Constants.SPECIES_BLACK_STORK) {
-                    continue;
+                if (pState.getBird(i).isAlive()) {
+
+                    // 1. Identify black stork
+                    int[] obss = getBirdObservations(pState.getBird(i));
+                    int bird_species = mostLikelySpecies(obss);
+                    if (bird_species == Constants.SPECIES_BLACK_STORK) {
+                        continue;
+                    }
+
+                    // 2. For the rest, compute most likely next movement
+                    Pair<Integer, Double> move_info = species[bird_species].nextMovement(obss);
+                    if (move_info.second > max_prob) {
+                        max_prob = move_info.second;
+                        movement = move_info.first;
+                        bird_to_shoot = i;
+                    }
                 }
 
-                // 2. For the rest, compute most likely next movement
-                Pair<Integer, Double> move_info = species[bird_species].nextMovement(obss);
-                if (move_info.second > max_prob) {
-                    max_prob = move_info.second;
-                    movement = move_info.first;
-                    bird_to_shoot = i;
+                // 3. Shoot most certain
+                // System.err.print("Shooting: ");
+                // System.err.println(max_prob);
+                if (max_prob > SHOOT_THRESHOLD) {
+                    System.err.print("FIRE! Prob: ");
+                    System.err.print(Math.round(max_prob * 100));
+                    System.err.print(", Bird:");
+                    System.err.println(bird_to_shoot);
+                    return new Action(bird_to_shoot, movement);
                 }
-            }
 
-            // 3. Shoot most certain
-            // System.err.print("Shooting: ");
-            // System.err.println(max_prob);
-            if (max_prob > SHOOT_THRESHOLD) {
-                System.err.print("FIRE! Prob: ");
-                System.err.print(Math.round(max_prob*100));
-                System.err.print(", Bird:");
-                System.err.println(bird_to_shoot);
-                return new Action(bird_to_shoot, movement);
             }
         }
 
