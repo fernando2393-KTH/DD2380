@@ -15,6 +15,7 @@ public class Species {
     public Species(int shoot_st, int guess_st, int emi) {
         shooting_model = new HMM(shoot_st, emi);
         guessing_model = new HMM(guess_st, emi);
+        guessing_model.is_guesser = true;
         observations = new ArrayList();
     }
 
@@ -56,9 +57,9 @@ public class Species {
     public Pair<Integer, Double> nextMovement(int[] obss) {
         // Deepcopy species shooting model
         HMM custom_bird_hmm = new HMM(shooting_model.states, shooting_model.emissions);
-        // custom_bird_hmm.A = matrixOps.get_matrix(shooting_model.A);
-        // custom_bird_hmm.B = matrixOps.get_matrix(shooting_model.B);
-        // custom_bird_hmm.pi = matrixOps.get_matrix(shooting_model.pi);
+        custom_bird_hmm.A = matrixOps.get_matrix(shooting_model.A);
+        custom_bird_hmm.B = matrixOps.get_matrix(shooting_model.B);
+        custom_bird_hmm.pi = matrixOps.get_matrix(shooting_model.pi);
         // Fine-tune with given obss
         // shooting_model.print_hmm();
         // custom_bird_hmm.print_hmm();

@@ -14,6 +14,7 @@ public class HMM {
     double[][] pi;
     int states;
     int emissions;
+    boolean is_guesser = false;
 
     public final int ITERATION_LIMIT = 1000;
     public final double LOG_NON_IMPROVEMENT = 0.001;
@@ -221,23 +222,37 @@ public class HMM {
 
     public Pair<Integer, Double> nextMove(int[] obss){
         Pair<double[][], double[]> alpha_info = fwdAlgorithm(obss);
-        
+
         double[][] current_state = new double[1][states];
+        double sum = 0;
         for (int i = 0; i < states; i++) {
             current_state[0][i] = alpha_info.first[i][alpha_info.first[0].length-1];
+            // System.err.print(Math.round(current_state[0][i]*100) + ", ");
+            sum += current_state[0][i];
         }
+        // System.err.println();
+        // System.err.println(sum);
+
         double[][] state_prob = matrixOps.multiply(current_state, A);
         double[][] emission_prob = matrixOps.multiply(state_prob, B);
 
         Pair<Integer, Double> result = new Pair();
         result.first = -1;
         result.second = Double.NEGATIVE_INFINITY;
+        sum = 0;
         for (int i = 0; i < emissions; i++) {
+            // System.err.print(Math.round(emission_prob[0][i]*100) + ", ");
+            sum += emission_prob[0][i];
             if (emission_prob[0][i] > result.second) {
                 result.first = i;
                 result.second = emission_prob[0][i];
             }
         }
+        // System.err.println();
+        // System.err.println(sum);
+
+        // if (result.second > 1)
+        //     System.exit(0);
         return result;
     }
 
@@ -269,29 +284,15 @@ public class HMM {
         // Backward pass
         double[][] beta = bkwAlgorithm(observations, norm_ctes);
 
-        // System.err.print("Alpha");
-        // matrixOps.print_matrix(alpha);
-        // System.err.print("CTES");
-        // matrixOps.print_vector(norm_ctes);
-        // System.err.print("BETA");
-        // matrixOps.print_matrix(beta);
-        // System.err.print("##################");
-
         // Compute di_gamma & gamma
         // (OBS: NO need to normalize gammas since we use both alpha and beta)
         double[][][] di_gamma = new double[T][states][states];
         double[][] gamma = new double[T][states];
         for (int t = 0; t < T - 1; t++) {
             for (int i = 0; i < states; i++) {
-                // double alpha_sum = 0;
-                // for (int k = 0; k < states; k++) {
-                // alpha_sum += alpha[k][T-1];
-                // }
                 // OBS: alpha_sum will always be 1 since its normalized
                 gamma[t][i] = 0;
                 for (int j = 0; j < states; j++) {
-                    // di_gamma[t][i][j] = (alpha[i][t] * A[i][j] * B[j][observations[t+1]] *
-                    // beta[j][t+1]) / alpha_sum;
                     di_gamma[t][i][j] = (alpha[i][t] * A[i][j] * B[j][observations[t + 1]] * beta[j][t + 1]);
                     gamma[t][i] += di_gamma[t][i][j];
                 }
@@ -326,7 +327,7 @@ public class HMM {
                         di_gamma_sum += gamma[t][i];
                     }
                 }
-                if (di_gamma_sum == 0)
+                if (di_gamma_sum == 0 && is_guesser)
                     di_gamma_sum = 1;
                 B[i][k] = di_gamma_sum / gamma_sum;
             }

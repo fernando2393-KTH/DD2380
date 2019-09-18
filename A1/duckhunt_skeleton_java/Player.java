@@ -6,11 +6,11 @@ class Player {
     private int timestep;
     private int[] sent_guesses;
 
-    public static final int SHOOTING_STATES = 2;
+    public static final int SHOOTING_STATES = 3;
     public static final int GUESSING_STATES = 1;
-    public static final double START_SHOOTING_TIMESTEP = 70;
-    public static final double START_SHOOTING_ROUND = 5;
-    public static final double SHOOT_THRESHOLD = 0.8;
+    public static final double START_SHOOTING_TIMESTEP = 75;
+    public static final double START_SHOOTING_ROUND = 2;
+    public static final double SHOOT_THRESHOLD = 0.75;
     public static final double USE_BAYES_ROUND = 3;
     public static final Action cDontShoot = new Action(-1, -1);
 
@@ -112,7 +112,14 @@ class Player {
 
     public int[] guess(GameState pState, Deadline pDue) {
         int birds_num = pState.getNumBirds();
+        
         sent_guesses = new int[birds_num];
+        if(pState.getRound() == 0) {
+            // for (int i = 0; i < birds_num; i++)
+            //     sent_guesses[i] = -1;
+            return sent_guesses;
+        }
+
         boolean use_bayes = allSpecies() && (pState.getRound() > USE_BAYES_ROUND);
         // if (use_bayes) 
         //     System.err.print("Using bayes");
