@@ -18,12 +18,12 @@ public class HMM {
     public final int ITERATION_LIMIT = 1000;
     public final double LOG_NON_IMPROVEMENT = 0.01;
 
-    public void init(int st, int emi) {
+    public HMM(int st, int emi) {
         states = st;
         emissions = emi;
-        A = new double[states][states];
-        B = new double[states][emissions];
-        pi = new double[1][states];
+        A = matrixOps.randomMatrix(states, states, true);
+        B = matrixOps.randomMatrix(states, emissions, false);
+        pi = matrixOps.randomMatrix(1, states, false);
     }
 
     // Reads values from console and populates A, B, pi

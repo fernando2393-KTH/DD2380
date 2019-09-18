@@ -6,17 +6,23 @@ class Player {
     private int timestep;
     private int[] sent_guesses;
 
-    public static final int STATES = 1;
+    public static final int SHOOTING_STATES = 2;
+    public static final int GUESSING_STATES = 1;
     public static final double START_SHOOTING_TIMESTEP = 60;
-    public static final double START_SHOOTING_ROUND = 3;
-    public static final double SHOOT_THRESHOLD = 0.8;
-    public static final int USE_BAYES_ROUND = 3;
+    public static final double START_SHOOTING_ROUND = 5;
+    public static final double SHOOT_THRESHOLD = 0.7;
+    public static final double USE_BAYES_ROUND = 3;
     public static final Action cDontShoot = new Action(-1, -1);
+
+    public int shots = 0;
+    public int hits = 0;
+    public int correct_guesses = 0;
+    public int failed_guesses = 0;
 
     public Player() {
         species = new Species[6];
         for (int i = 0; i < species.length; i++) {
-            species[i] = new Species(STATES, 9);
+            species[i] = new Species(SHOOTING_STATES, GUESSING_STATES, 9);
         }
     }
 
@@ -35,7 +41,7 @@ class Player {
         double max = Double.NEGATIVE_INFINITY;
         int max_pos = -1;
         for (int j = 0; j < species.length; j++) {
-            double value = species[j].getProb(obss, use_bayes);
+            double value = species[j].getSpeciesProb(obss, use_bayes);
             if (value > max) {
                 max = value;
                 max_pos = j;
@@ -55,10 +61,7 @@ class Player {
 
     public Action shoot(GameState pState, Deadline pDue) {
         timestep += pState.getNumNewTurns(); // Update timestep count
-        boolean use_bayes = false;
-        if (timestep == 1)
-            use_bayes = allSpecies() && (pState.getRound() > 3);
-
+        boolean use_bayes = allSpecies() && (pState.getRound() > USE_BAYES_ROUND);
 
         if (timestep > START_SHOOTING_TIMESTEP && pState.getRound() > START_SHOOTING_ROUND) {
             int num_birds = pState.getNumBirds();
@@ -66,32 +69,41 @@ class Player {
             int movement = -1;
             int bird_to_shoot = -1;
             for (int i = 0; i < num_birds; i++) {
+                if (pState.getBird(i).isAlive()) {
 
-                // 1. Identify black stork
-                int[] obss = getBirdObservations(pState.getBird(i));
-                int bird_species = mostLikelySpecies(obss, use_bayes);
-                if (bird_species == Constants.SPECIES_BLACK_STORK) {
-                    continue;
+                    // 1. Identify black stork
+                    int[] obss = getBirdObservations(pState.getBird(i));
+                    // System.err.println("OBSERVATIONS");
+                    // for (int j = 0; j < obss.length; j++) {
+                    //     System.err.println(obss[j]);
+                    // }
+
+                    int bird_species = mostLikelySpecies(obss, use_bayes);
+                    if (bird_species == Constants.SPECIES_BLACK_STORK) {
+                        continue;
+                    }
+
+                    // 2. For the rest, compute most likely next movement
+                    Pair<Integer, Double> move_info = species[bird_species].nextMovement(obss);
+                    if (move_info.second > max_prob) {
+                        max_prob = move_info.second;
+                        movement = move_info.first;
+                        bird_to_shoot = i;
+                    }
                 }
 
-                // 2. For the rest, compute most likely next movement
-                Pair<Integer, Double> move_info = species[bird_species].nextMovement(obss);
-                if (move_info.second > max_prob) {
-                    max_prob = move_info.second;
-                    movement = move_info.first;
-                    bird_to_shoot = i;
+                // 3. Shoot most certain
+                // System.err.print("Shooting: ");
+                // System.err.println(max_prob);
+                if (max_prob > SHOOT_THRESHOLD) {
+                    shots++;
+                    System.err.print("FIRE! Prob: ");
+                    System.err.print(Math.round(max_prob * 100));
+                    System.err.print(", Bird: ");
+                    System.err.println(bird_to_shoot);
+                    return new Action(bird_to_shoot, movement);
                 }
-            }
 
-            // 3. Shoot most certain
-            // System.err.print("Shooting: ");
-            // System.err.println(max_prob);
-            if (max_prob > SHOOT_THRESHOLD) {
-                System.err.print("FIRE! Prob: ");
-                System.err.print(Math.round(max_prob*100));
-                System.err.print(", Bird:");
-                System.err.println(bird_to_shoot);
-                return new Action(bird_to_shoot, movement);
             }
         }
 
@@ -101,8 +113,9 @@ class Player {
     public int[] guess(GameState pState, Deadline pDue) {
         int birds_num = pState.getNumBirds();
         sent_guesses = new int[birds_num];
-        boolean use_bayes = allSpecies() && (pState.getRound() > 3);
-
+        boolean use_bayes = allSpecies() && (pState.getRound() > USE_BAYES_ROUND);
+        // if (use_bayes) 
+        //     System.err.print("Using bayes");
 
         for (int i = 0; i < birds_num; i++) {
             Bird bird = pState.getBird(i);
@@ -113,6 +126,7 @@ class Player {
     }
 
     public void hit(GameState pState, int pBird, Deadline pDue) {
+        hits++;
         System.err.println("HIT BIRD!!!");
     }
 
@@ -128,6 +142,9 @@ class Player {
             else
                 error++;
         }
+        correct_guesses +=correct;
+        failed_guesses += error;
+
         System.err.print("Sent: ");
         for (int i = 0; i < real_vals.length; i++) {
             System.err.print(sent_guesses[i]);
@@ -157,7 +174,10 @@ class Player {
      * @param pDue     time before which we must have returned
      */
     public void reveal(GameState pState, int[] pSpecies, Deadline pDue) {
+        timestep = 0;
         guessingStatistics(pSpecies);
+        System.err.println("SHOOTING: SHOTS: " + shots + ", HITS: " + hits + ", POINTS: " + (hits - (shots - hits)));
+        System.err.println("GUESSING: CORRECT: " + correct_guesses + ", FAILED: " + failed_guesses + ", POINTS: " + (correct_guesses - failed_guesses));
 
         // Assign Birds
         int birds_num = pState.getNumBirds();
@@ -169,10 +189,7 @@ class Player {
         }
         // Update species
         for (int i = 0; i < species.length; i++) {
-            species[i].updateModel();
-            // System.err.print("---------------SPECIES: ");
-            // System.err.println(i);
-            // species[i].printSpecies();
+            species[i].updateModels();
         }
         // System.exit(0);
     }

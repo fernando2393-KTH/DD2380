@@ -260,4 +260,15 @@ public class matrixOps {
             }
         }
     }
+
+    public static double[][] get_matrix(double[][] o) {
+        double[][] d = new double[o.length][o[0].length];
+        for (int i = 0; i < o.length; i++) {
+            for (int j = 0; j < o[0].length; j++) {
+                d[i][j] = o[i][j];
+            }
+        }
+        return d;
+    }
+    
 }
