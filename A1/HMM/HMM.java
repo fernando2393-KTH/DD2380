@@ -39,8 +39,8 @@ public class HMM {
     public void randomInit(int st, int emi) {
         states = st;
         emissions = emi;
-        A = matrixOps.randomMatrix(states, states, true);
-        B = matrixOps.randomMatrix(states, emissions, true);
+        A = matrixOps.randomMatrix(states, states, false);
+        B = matrixOps.randomMatrix(states, emissions, false);
         pi = matrixOps.randomMatrix(1, states, false);
     }
 
@@ -282,7 +282,7 @@ public class HMM {
         double log_prob_ant = - (LOG_NON_IMPROVEMENT + 1);
         double log_prob = 0;
 
-        while (iterations < ITERATION_LIMIT && log_prob - log_prob_ant >= LOG_NON_IMPROVEMENT) {
+        while (iterations < ITERATION_LIMIT && (log_prob - log_prob_ant) >= LOG_NON_IMPROVEMENT) {
             log_prob_ant = log_prob;
             updateHMM(observations);
 

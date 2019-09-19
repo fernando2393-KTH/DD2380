@@ -197,7 +197,7 @@ public class matrixOps {
         // Generate random values
         double sum = 0;
         for (int i = 0; i < length; i++) {
-            vector[i] = Math.random();            
+            vector[i] = Math.round(Math.random()*100)/100.0;            
             if (i == enhance) // Makes diagonal elements higher to avoid bad conditioning
                 vector[i] = 4*Math.random();
             sum += vector[i];

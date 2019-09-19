@@ -10,7 +10,7 @@ public class HMMc {
     private static double[][] pi_real = { { 1, 0, 0 } };
 
     private static final int IT_INCREMENT = 10;
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     public static void main(String[] args) {
 
@@ -79,7 +79,9 @@ public class HMMc {
 
             last_log_prob_array[i / IT_INCREMENT - 1] = estimated_log_prob;
             iterations_array[i / IT_INCREMENT - 1] = nw_details.second;
-            error_matrices[i / IT_INCREMENT - 1] = Math.abs(estimated_log_prob - original_log_prob); // Calculation of the difference of probabilities
+            error_matrices[i / IT_INCREMENT - 1] = Math.abs((estimated_log_prob - original_log_prob)/original_log_prob); // Calculation of the difference of probabilities
+
+            hmm.print_hmm();
 
             // hmm reset            
             matrixOps.copy_matrix(A_aux, hmm.A);
