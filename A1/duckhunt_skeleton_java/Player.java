@@ -11,7 +11,11 @@ class Player {
     public static final double START_SHOOTING_TIMESTEP = 77;
     public static final double START_SHOOTING_ROUND = 1;
     public static final double SHOOT_THRESHOLD = 0.68;
+<<<<<<< HEAD
     public static final double USE_BAYES_ROUND = 11;
+=======
+    public static final double USE_BAYES_ROUND = 3;
+>>>>>>> 1288d7975b44f24d91c3de687f8c1944378b4b50
     public static final Action cDontShoot = new Action(-1, -1);
 
     public int shots = 0;
