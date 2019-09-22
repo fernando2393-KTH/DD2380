@@ -6,12 +6,12 @@ class Player {
     private int timestep;
     private int[] sent_guesses;
 
-    public static final int SHOOTING_STATES = 3;
+    public static final int SHOOTING_STATES = 2;
     public static final int GUESSING_STATES = 1;
-    public static final double START_SHOOTING_TIMESTEP = 75;
-    public static final double START_SHOOTING_ROUND = 2;
-    public static final double SHOOT_THRESHOLD = 0.75;
-    public static final double USE_BAYES_ROUND = 3;
+    public static final double START_SHOOTING_TIMESTEP = 77;
+    public static final double START_SHOOTING_ROUND = 1;
+    public static final double SHOOT_THRESHOLD = 0.68;
+    public static final double USE_BAYES_ROUND = 11;
     public static final Action cDontShoot = new Action(-1, -1);
 
     public int shots = 0;

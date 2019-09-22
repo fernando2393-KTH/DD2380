@@ -17,7 +17,7 @@ public class HMM {
     boolean is_guesser = false;
 
     public final int ITERATION_LIMIT = 1000;
-    public final double LOG_NON_IMPROVEMENT = 0.001;
+    public final double LOG_NON_IMPROVEMENT = 0.0001;
 
     public HMM(int st, int emi) {
         states = st;
