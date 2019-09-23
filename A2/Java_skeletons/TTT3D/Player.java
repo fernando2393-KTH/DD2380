@@ -19,7 +19,7 @@ public class Player {
             return new GameState(gameState, new Move());
         }
 
-        int nextMove = alg.alphabeta(gameState, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, Constants.CELL_X).first;
+        int nextMove = alg.alphabeta(gameState, 2, Integer.MIN_VALUE, Integer.MAX_VALUE, Constants.CELL_X).first;
         return nextStates.elementAt(nextMove);
     }
 }
