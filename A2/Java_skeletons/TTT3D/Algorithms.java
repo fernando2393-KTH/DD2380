@@ -15,6 +15,8 @@ public class Algorithms {
         Vector<GameState> nextStates = new Vector<GameState>();
         gameState.findPossibleMoves(nextStates);
 
+        byte switcher = 0;
+
         if (gameState.isXWin())
             return new Pair<Integer, Integer>(0, Integer.MAX_VALUE);
         if (gameState.isOWin())
@@ -29,14 +31,24 @@ public class Algorithms {
             int bestState = 0;
             int v = Integer.MIN_VALUE;
             for (int i = 0; i < nextStates.size(); i++) {
-                Pair<Integer, Integer> state_i = alphabeta(nextStates.elementAt(i), depth - 1, alpha, beta, Constants.CELL_O);
-                if (state_i.second > v) {
-                    v = state_i.second;
-                    bestState = i;
+                if(depth > 1 || (depth == 1 && switcher == 0)){
+
+                    if (depth == 1){
+                        switcher = 1;
+                    }
+
+                    Pair<Integer, Integer> state_i = alphabeta(nextStates.elementAt(i), depth - 1, alpha, beta, Constants.CELL_O);
+                    if (state_i.second > v) {
+                        v = state_i.second;
+                        bestState = i;
+                    }
+                    alpha = Math.max(alpha, v);
+                    if (beta <= alpha)
+                        break;
                 }
-                alpha = Math.max(alpha, v);
-                if (beta <= alpha)
-                    break;
+                if (depth == 1 && switcher == 1){
+                    switcher = 0;
+                }
             }
             return new Pair<Integer, Integer>(bestState, v);  // move, val
         }
@@ -45,6 +57,12 @@ public class Algorithms {
         int bestState = 0;    
         int v = Integer.MAX_VALUE;
         for (int i = 0; i < nextStates.size(); i++) {
+            if(depth > 1 || (depth == 1 && switcher == 0)){
+
+                if (depth == 1){
+                    switcher = 1;
+                }
+                
             Pair<Integer, Integer> state_i = alphabeta(nextStates.elementAt(i), depth - 1, alpha, beta, Constants.CELL_X);
             if (state_i.second < v) {
                 v = state_i.second;
@@ -54,6 +72,11 @@ public class Algorithms {
             if (beta <= alpha)
                 break;
         }
+        if (depth == 1 && switcher == 1){
+            switcher = 0;
+        }
+    }
+    
         return new Pair<Integer, Integer>(bestState, v);
     }
   
