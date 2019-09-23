@@ -58,7 +58,7 @@ public class Algorithms {
     }
   
     public int evaluation3d(GameState gameState, int player) {
-        int board_size = gameState.BOARD_SIZE;
+        int board_size = GameState.BOARD_SIZE;
         int result = 0;
         
         // Get all the layers
@@ -110,7 +110,7 @@ public class Algorithms {
     }
 
     public int[][] getLayer(GameState gameState, int i, int j, int k) {
-        int board_size = gameState.BOARD_SIZE;
+        int board_size = GameState.BOARD_SIZE;
         int[][] result = new int[board_size][board_size];
 
         for (int r = 0; r < board_size; r++)
