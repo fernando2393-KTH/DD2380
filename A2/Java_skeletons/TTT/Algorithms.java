@@ -51,8 +51,13 @@ public class Algorithms {
         Vector<GameState> nextStates = new Vector<GameState>();
         gameState.findPossibleMoves(nextStates);
 
+        if (gameState.isXWin())
+            return new Pair(0, Integer.MAX_VALUE);
+        if (gameState.isOWin())
+            return new Pair(0, Integer.MIN_VALUE);
+
         // If terminal state
-        if (depth == 0 || nextStates.size() == 0)
+        if (depth == 0 || gameState.isEOG())
             return new Pair<Integer, Integer>(0, evaluation(gameState, player)); // move, val
 
         // If player is X
@@ -151,7 +156,6 @@ public class Algorithms {
         result += playerChecker(player, numberX, numberO); // Check winner of the second diagonal
 
         return result;
-
     }
 
     /**

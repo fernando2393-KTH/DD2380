@@ -17,7 +17,8 @@ public class Player {
             // Must play "pass" move if there are no other moves possible.
             return new GameState(gameState, new Move());
         }
-        int nextMove = alg.alphabeta(gameState, 2, Integer.MIN_VALUE, Integer.MAX_VALUE,
+
+        int nextMove = alg.alphabeta(gameState, 5, Integer.MIN_VALUE, Integer.MAX_VALUE,
                 Constants.CELL_X).first;
         return nextStates.elementAt(nextMove);
 
