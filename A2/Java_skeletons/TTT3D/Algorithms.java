@@ -26,7 +26,7 @@ public class Algorithms {
 
         // If player is X
         if (player == Constants.CELL_X) {
-            int bestState = -1;
+            int bestState = 0;
             int v = Integer.MIN_VALUE;
             for (int i = 0; i < nextStates.size(); i++) {
                 Pair<Integer, Integer> state_i = alphabeta(nextStates.elementAt(i), depth - 1, alpha, beta, Constants.CELL_O);
@@ -42,7 +42,7 @@ public class Algorithms {
         }
         
         // If player is O
-        int bestState = -1;      
+        int bestState = 0;    
         int v = Integer.MAX_VALUE;
         for (int i = 0; i < nextStates.size(); i++) {
             Pair<Integer, Integer> state_i = alphabeta(nextStates.elementAt(i), depth - 1, alpha, beta, Constants.CELL_X);
@@ -56,8 +56,7 @@ public class Algorithms {
         }
         return new Pair<Integer, Integer>(bestState, v);
     }
-
-    
+  
     public int evaluation3d(GameState gameState, int player) {
         int board_size = gameState.BOARD_SIZE;
         int result = 0;
@@ -125,7 +124,6 @@ public class Algorithms {
             }
         return result;
     }
-
 
     /**
      * 
