@@ -45,45 +45,47 @@ public class Algorithms {
      * @param alpha     Best value MAX can get
      * @param beta      Worst value MAX can get
      * @param player    Current Player
-     * @return
+     * @return // position, value
      */
     public Pair<Integer, Integer> alphabeta(GameState gameState, int depth, int alpha, int beta, int player) {
-        int v = 0;
-        int bestState = 0;
-        Pair<Integer, Integer> state_i;
         Vector<GameState> nextStates = new Vector<GameState>();
         gameState.findPossibleMoves(nextStates);
-        // int nextPlayer = (player + 1)%2;
 
-        if (depth == 0 || nextStates.size() == 0) {
-            v = evaluation(gameState, player);
-            return new Pair<Integer, Integer>(v, bestState);
-        } else if (player == Constants.CELL_X) {
-            v = Integer.MIN_VALUE;
+        // If terminal state
+        if (depth == 0 || nextStates.size() == 0)
+            return new Pair<Integer, Integer>(0, evaluation(gameState, player)); // move, val
+
+        // If player is X
+        if (player == Constants.CELL_X) {
+            int bestState = -1;
+            int v = Integer.MIN_VALUE;
             for (int i = 0; i < nextStates.size(); i++) {
-                state_i = alphabeta(gameState, depth - 1, alpha, beta, Constants.CELL_O);
-                if (state_i.first > v) {
-                    v = state_i.first;
+                Pair<Integer, Integer> state_i = alphabeta(nextStates.elementAt(i), depth - 1, alpha, beta, Constants.CELL_O);
+                if (state_i.second > v) {
+                    v = state_i.second;
                     bestState = i;
                 }
                 alpha = Math.max(alpha, v);
                 if (beta <= alpha)
                     break;
             }
-        } else {
-            v = Integer.MAX_VALUE;
-            for (int i = 0; i < nextStates.size(); i++) {
-                state_i = alphabeta(gameState, depth - 1, alpha, beta, Constants.CELL_X);
-                if (state_i.first < v) {
-                    v = state_i.first;
-                    bestState = i;
-                }
-                beta = Math.min(beta, v);
-                if (beta <= alpha)
-                    break;
-            }
+            return new Pair<Integer, Integer>(bestState, v);  // move, val
         }
-        return new Pair<Integer, Integer>(v, bestState);
+        
+        // If player is O
+        int bestState = -1;      
+        int v = Integer.MAX_VALUE;
+        for (int i = 0; i < nextStates.size(); i++) {
+            Pair<Integer, Integer> state_i = alphabeta(nextStates.elementAt(i), depth - 1, alpha, beta, Constants.CELL_X);
+            if (state_i.second < v) {
+                v = state_i.second;
+                bestState = i;
+            }
+            beta = Math.min(beta, v);
+            if (beta <= alpha)
+                break;
+        }
+        return new Pair<Integer, Integer>(bestState, v);
     }
 
     /**
@@ -93,90 +95,60 @@ public class Algorithms {
      * @return the total gains of moving to gameState
      */
     public int evaluation(GameState gameState, int player) {
-
         int result = 0;
 
-        /*********** Lines checking ***********/
-
+        /*********** Rows checking ***********/
         for (int i = 0; i < GameState.BOARD_SIZE; i++) {
-
             int numberX = 0; // Number of X in the line
             int numberO = 0; // Number of O in the line
-
             for (int j = 0; j < GameState.BOARD_SIZE; j++) {
-
                 if (gameState.at(i, j) == Constants.CELL_X) {
                     numberX++;
                 } else if (gameState.at(i, j) == Constants.CELL_O) {
                     numberO++;
                 }
             }
-
-            // Check winner of the row
-
-            result += playerChecker(player, numberX, numberO);
-
+            result += playerChecker(player, numberX, numberO); // Check winner of the row
         }
 
         /*********** Columns checking ***********/
-
         for (int i = 0; i < GameState.BOARD_SIZE; i++) {
-
             int numberX = 0; // Number of X in the column
             int numberO = 0; // Number of O in the column
-
             for (int j = 0; j < GameState.BOARD_SIZE; j++) {
-
                 if (gameState.at(j, i) == Constants.CELL_X) {
                     numberX++;
                 } else if (gameState.at(j, i) == Constants.CELL_O) {
                     numberO++;
                 }
             }
-
-            // Check winner of the column
-
-            result += playerChecker(player, numberX, numberO);
-
+            result += playerChecker(player, numberX, numberO); // Check winner of the column
         }
 
         /*********** Diagonals checking ***********/
-
         // First diagonal
-
         int numberX = 0; // Number of X in the first diagonal
         int numberO = 0; // Number of O in the first diagonal
-
         for (int i = 0; i < GameState.BOARD_SIZE; i++) {
-
             if (gameState.at(i, i) == Constants.CELL_X) {
                 numberX++;
             } else if (gameState.at(i, i) == Constants.CELL_O) {
                 numberO++;
             }
         }
-
-        // Check winner of the first diagonal
-
-        result += playerChecker(player, numberX, numberO);
+        result += playerChecker(player, numberX, numberO); // Check winner of the first diagonal
 
         // Second diagonal
-
         numberX = 0; // Number of X in the second diagonal
         numberO = 0; // Number of O in the second diagonal
-
         for (int i = 0; i < GameState.BOARD_SIZE; i++) {
-
             if (gameState.at(i, (GameState.BOARD_SIZE - 1) - i) == Constants.CELL_X) {
                 numberX++;
             } else if (gameState.at(i, (GameState.BOARD_SIZE - 1) - i) == Constants.CELL_O) {
                 numberO++;
             }
         }
-
-        // Check winner of the second diagonal
-
-        result += playerChecker(player, numberX, numberO);
+        result += playerChecker(player, numberX, numberO); // Check winner of the second diagonal
 
         return result;
 
@@ -190,25 +162,22 @@ public class Algorithms {
      * @return 0 if draw, 1 if player wins, -1 if player loses
      */
     public int playerChecker(int player, int numberX, int numberO) {
-
-        int result = 0;
-
-        if (player == Constants.CELL_X) {
-            if (numberX > numberO) {
-                result++;
-            } else {
-                result--;
-            }
-        } else {
-            if (numberX > numberO) {
-                result--;
-            } else {
-                result++;
-            }
+        // Assume we are player X
+        int n_good = numberX;
+        int n_bad = numberO;
+        if (player == Constants.CELL_O) { // Swap values otherwise
+            n_good = numberO;
+            n_bad = numberX;
         }
 
-        return result;
-
+        if (n_good > 0 && n_bad == 0)
+            return (int) Math.pow(10, n_good);
+        if (n_good > 0 && n_bad > 0)
+            return 0;
+        if (n_bad > 0 && n_good == 0)
+            return (int) -Math.pow(10, n_bad);
+        if (n_good == 0 && n_bad == 0)
+            return 1;
+        return 0;
     }
-
 }
