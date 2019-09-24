@@ -185,25 +185,12 @@ public class HMM {
         // Backward pass
         double[][] beta = bkwAlgorithm(observations, norm_ctes);
 
-        // System.out.print("Alpha");
-        // matrixOps.print_matrix(alpha);
-        // System.out.print("CTES");
-        // matrixOps.print_vector(norm_ctes);
-        // System.out.print("BETA");
-        // matrixOps.print_matrix(beta);
-        // System.out.print("##################");
-
         // Compute di_gamma & gamma
         // (OBS: NO need to normalize gammas since we use both alpha and beta)
         double[][][] di_gamma = new double[T][states][states];
         double[][] gamma = new double[T][states];
         for (int t = 0; t < T - 1; t++) {
             for (int i = 0; i < states; i++) {
-                // double alpha_sum = 0;
-                // for (int k = 0; k < states; k++) {
-                // alpha_sum += alpha[k][T-1];
-                // }
-                // OBS: alpha_sum will always be 1 since its normalized
                 gamma[t][i] = 0;
                 for (int j = 0; j < states; j++) {
                     // di_gamma[t][i][j] = (alpha[i][t] * A[i][j] * B[j][observations[t+1]] *

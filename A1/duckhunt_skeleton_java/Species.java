@@ -47,10 +47,11 @@ public class Species {
         // IDEA: P(lambda|obs) = P(obs|lambda)*P(lambda)/P(obs)
         // EQUIVALENT = log(P(obs|lambda)) + log(P(lambda))
         double obs_lambda = guessing_model.obsLogProb(obss);
-        // if (use_bayes && bird_num > 0) {
-        //     double p_lamda = Math.log(((double) bird_num)/((double) total_bird_num));
-        //     return obs_lambda + p_lamda;
-        // }
+        if (use_bayes && bird_num > 0) {
+            // System.err.println("using bayes");
+            double p_lamda = Math.log(((double) bird_num)/((double) total_bird_num));
+            return obs_lambda + p_lamda;
+        }
         return obs_lambda;
     }
 
