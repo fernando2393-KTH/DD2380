@@ -31,30 +31,19 @@ public class Algorithms {
         if (gameState.isEOG())
             return new Pair<Integer, Integer>(0, 0);
 
-        // System.err.println(deadline.timeUntil() + ", " + stop_time);
-        // If no time left
-        // if (deadline.timeUntil() <= stop_time){
-        //     System.err.println("Early stopping");
-        //     return new Pair<Integer, Integer>(0, 0);
-            // if (player == Constants.CELL_X) {
-            //     return new Pair<Integer, Integer>(0, 0);
-            // }
-            // if (player == Constants.CELL_O) {
-            //     return new Pair<Integer, Integer>(0, 0);
-            // }
-        // If terminal state
+        // If max setted depth
         if (depth == 0)
             return new Pair<Integer, Integer>(0, evaluation3d(gameState, player)); // move, val
 
         Vector<GameState> nextStates = new Vector<GameState>();
         gameState.findPossibleMoves(nextStates);
 
-        // GameStateComparer comparator = new GameStateComparer();
-        // comparator.player = player;
-        // Collections.sort(nextStates, comparator);
-        // for (int i = 0; i < nextStates.size(); i++) {
-        //     System.err.print(" " + evaluation3d(nextStates.elementAt(i), player));
-        // }
+        GameStateComparer comparator = new GameStateComparer();
+        comparator.player = player;
+        Collections.sort(nextStates, comparator);
+        for (int i = 0; i < nextStates.size(); i++) {
+            System.err.print(" " + evaluation3d(nextStates.elementAt(i), player));
+        }
         // System.err.println("");
 
         // If player is X
