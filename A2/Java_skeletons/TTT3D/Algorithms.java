@@ -1,6 +1,15 @@
 import java.util.*;
 
 public class Algorithms {
+    // boolean return_now = false;
+    Deadline deadline;
+    long stop_time;
+
+    private static final int[][] SCORES = { {1, -10, -100, -1000},
+                                            {10, 0, 0, 0},
+                                            {100, 0, 0, 0},
+                                            {1000, 0, 0, 0}};
+
     /**
      * Performs alphabeta prunning
      * 
@@ -12,8 +21,6 @@ public class Algorithms {
      * @return // position, value
      */
     public Pair<Integer, Integer> alphabeta(GameState gameState, int depth, int alpha, int beta, int player) {
-        Vector<GameState> nextStates = new Vector<GameState>();
-        gameState.findPossibleMoves(nextStates);
 
         byte switcher = 0;
 
@@ -21,10 +28,16 @@ public class Algorithms {
             return new Pair<Integer, Integer>(0, Integer.MAX_VALUE);
         if (gameState.isOWin())
             return new Pair<Integer, Integer>(0, Integer.MIN_VALUE);
+        if (gameState.isEOG())
+            return new Pair<Integer, Integer>(0, 0);
+
 
         // If terminal state
-        if (depth == 0 || gameState.isEOG())
+        if (depth == 0)
             return new Pair<Integer, Integer>(0, evaluation3d(gameState, player)); // move, val
+
+        Vector<GameState> nextStates = new Vector<GameState>();
+        gameState.findPossibleMoves(nextStates);
 
         // If player is X
         if (player == Constants.CELL_X) {
@@ -52,33 +65,38 @@ public class Algorithms {
             }
             return new Pair<Integer, Integer>(bestState, v);  // move, val
         }
-        
-        // If player is O
-        int bestState = 0;    
-        int v = Integer.MAX_VALUE;
-        for (int i = 0; i < nextStates.size(); i++) {
-            if(depth > 1 || (depth == 1 && switcher == 0)){
 
-                if (depth == 1){
-                    switcher = 1;
+        else {
+            // If player is O
+            int bestState = 0;    
+            int v = Integer.MAX_VALUE;
+            for (int i = nextStates.size()-1; i > -1; i--) {
+
+                if(depth > 1 || (depth == 1 && switcher == 0)){
+
+                    if (depth == 1){
+                        switcher = 1;
+                    }
+
+                Pair<Integer, Integer> state_i = alphabeta(nextStates.elementAt(i), depth - 1, alpha, beta, Constants.CELL_X);
+                if (state_i.second < v) {
+                    v = state_i.second;
+                    bestState = i;
                 }
-                
-            Pair<Integer, Integer> state_i = alphabeta(nextStates.elementAt(i), depth - 1, alpha, beta, Constants.CELL_X);
-            if (state_i.second < v) {
-                v = state_i.second;
-                bestState = i;
+                beta = Math.min(beta, v);
+                if (beta <= alpha)
+                    break;
             }
-            beta = Math.min(beta, v);
-            if (beta <= alpha)
-                break;
-        }
-        if (depth == 1 && switcher == 1){
-            switcher = 0;
-        }
+
+            if (depth == 1 && switcher == 1){
+                switcher = 0;
+            }                
+            }
+
+            return new Pair<Integer, Integer>(bestState, v);  // move, val
+        
     }
-    
-        return new Pair<Integer, Integer>(bestState, v);
-    }
+}
   
     public int evaluation3d(GameState gameState, int player) {
         int board_size = GameState.BOARD_SIZE;
@@ -100,7 +118,7 @@ public class Algorithms {
             if (gameState.at(i, i, i) == Constants.CELL_X) numberX++;
             else if (gameState.at(i, i, i) == Constants.CELL_O) numberO++;
         }
-        result += playerChecker(player, numberX, numberO);
+        result += SCORES[numberX][numberO];
 
         // Diag 2
         numberX = 0;
@@ -109,7 +127,7 @@ public class Algorithms {
             if (gameState.at((board_size - 1) - i, i, i) == Constants.CELL_X) numberX++;
             else if (gameState.at((board_size - 1) - i, i, i) == Constants.CELL_O) numberO++;
         }
-        result += playerChecker(player, numberX, numberO);
+        result += SCORES[numberX][numberO];
 
         // Diag 3
         numberX = 0;
@@ -118,7 +136,7 @@ public class Algorithms {
             if (gameState.at((board_size - 1) - i, (board_size - 1) - i, i) == Constants.CELL_X) numberX++;
             else if (gameState.at((board_size - 1) - i, (board_size - 1) - i, i) == Constants.CELL_O) numberO++;
         }
-        result += playerChecker(player, numberX, numberO);
+        result += SCORES[numberX][numberO];
         
         // Diag 4
         numberX = 0;
@@ -127,7 +145,7 @@ public class Algorithms {
             if (gameState.at(i, (board_size - 1) - i, i) == Constants.CELL_X) numberX++;
             else if (gameState.at(i, (board_size - 1) - i, i) == Constants.CELL_O) numberO++;
         }
-        result += playerChecker(player, numberX, numberO);
+        result += SCORES[numberX][numberO];
 
         return result;
     }
@@ -168,7 +186,7 @@ public class Algorithms {
                     numberO++;
                 }
             }
-            result += playerChecker(player, numberX, numberO); // Check winner of the row
+            result += SCORES[numberX][numberO]; // Check winner of the row
         }
 
         /*********** Columns checking ***********/
@@ -182,7 +200,7 @@ public class Algorithms {
                     numberO++;
                 }
             }
-            result += playerChecker(player, numberX, numberO); // Check winner of the column
+            result += SCORES[numberX][numberO]; // Check winner of the column
         }
 
         /*********** Diagonals checking ***********/
@@ -196,7 +214,7 @@ public class Algorithms {
                 numberO++;
             }
         }
-        result += playerChecker(player, numberX, numberO); // Check winner of the first diagonal
+        result += SCORES[numberX][numberO]; // Check winner of the first diagonal
 
         // Second diagonal
         numberX = 0; // Number of X in the second diagonal
@@ -208,35 +226,7 @@ public class Algorithms {
                 numberO++;
             }
         }
-        result += playerChecker(player, numberX, numberO); // Check winner of the second diagonal
-
+        result += SCORES[numberX][numberO]; // Check winner of the second diagonal
         return result;
-    }
-
-    /**
-     * 
-     * @param player  the current player
-     * @param numberX the number of X to evaluate
-     * @param numberO the number of O to evaluate
-     * @return 0 if draw, 1 if player wins, -1 if player loses
-     */
-    public int playerChecker(int player, int numberX, int numberO) {
-        // Assume we are player X
-        int n_good = numberX;
-        int n_bad = numberO;
-        if (player == Constants.CELL_O) { // Swap values otherwise
-            n_good = numberO;
-            n_bad = numberX;
-        }
-
-        if (n_good > 0 && n_bad == 0)
-            return (int) Math.pow(10, n_good);
-        if (n_good > 0 && n_bad > 0)
-            return 0;
-        if (n_bad > 0 && n_good == 0)
-            return (int) -Math.pow(10, n_bad);
-        if (n_good == 0 && n_bad == 0)
-            return 1;
-        return 0;
     }
 }
