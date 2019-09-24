@@ -21,8 +21,8 @@ public class Algorithms {
      * @return // position, value
      */
     public Pair<Integer, Integer> alphabeta(GameState gameState, int depth, int alpha, int beta, int player) {
-        if (deadline.timeUntil() <= stop_time)
-            return new Pair<Integer, Integer>(0, 0);
+
+        byte switcher = 0;
 
         if (gameState.isXWin())
             return new Pair<Integer, Integer>(0, Integer.MAX_VALUE);
@@ -31,60 +31,75 @@ public class Algorithms {
         if (gameState.isEOG())
             return new Pair<Integer, Integer>(0, 0);
 
-        // If max setted depth
+
+        // If terminal state
         if (depth == 0)
             return new Pair<Integer, Integer>(0, evaluation3d(gameState, player)); // move, val
 
         Vector<GameState> nextStates = new Vector<GameState>();
         gameState.findPossibleMoves(nextStates);
 
-        GameStateComparer comparator = new GameStateComparer();
-        comparator.player = player;
-        Collections.sort(nextStates, comparator);
-        for (int i = 0; i < nextStates.size(); i++) {
-            System.err.print(" " + evaluation3d(nextStates.elementAt(i), player));
-        }
-        // System.err.println("");
-
         // If player is X
         if (player == Constants.CELL_X) {
             int bestState = 0;
             int v = Integer.MIN_VALUE;
             for (int i = 0; i < nextStates.size(); i++) {
-                Pair<Integer, Integer> state_i = alphabeta(nextStates.elementAt(i), depth - 1, alpha, beta, Constants.CELL_O);
-                if (state_i.second > v) {
-                    v = state_i.second;
-                    bestState = i;
+                if(depth > 1 || (depth == 1 && switcher == 0)){
+
+                    if (depth == 1){
+                        switcher = 1;
+                    }
+
+                    Pair<Integer, Integer> state_i = alphabeta(nextStates.elementAt(i), depth - 1, alpha, beta, Constants.CELL_O);
+                    if (state_i.second > v) {
+                        v = state_i.second;
+                        bestState = i;
+                    }
+                    alpha = Math.max(alpha, v);
+                    if (beta <= alpha)
+                        break;
                 }
-                alpha = Math.max(alpha, v);
-                if (beta <= alpha)
-                    break;
-                if (deadline.timeUntil() < stop_time)
-                    break;
+                if (depth == 1 && switcher == 1){
+                    switcher = 0;
+                }
             }
             return new Pair<Integer, Integer>(bestState, v);  // move, val
         }
-        
-        // If player is O
-        int bestState = 0;    
-        int v = Integer.MAX_VALUE;
-        for (int i = nextStates.size()-1; i > -1; i--) {
-            Pair<Integer, Integer> state_i = alphabeta(nextStates.elementAt(i), depth - 1, alpha, beta, Constants.CELL_X);
-            if (state_i.second < v) {
-                v = state_i.second;
-                bestState = i;
+
+        else {
+            // If player is O
+            int bestState = 0;    
+            int v = Integer.MAX_VALUE;
+            for (int i = nextStates.size()-1; i > -1; i--) {
+
+                if(depth > 1 || (depth == 1 && switcher == 0)){
+
+                    if (depth == 1){
+                        switcher = 1;
+                    }
+
+                Pair<Integer, Integer> state_i = alphabeta(nextStates.elementAt(i), depth - 1, alpha, beta, Constants.CELL_X);
+                if (state_i.second < v) {
+                    v = state_i.second;
+                    bestState = i;
+                }
+                beta = Math.min(beta, v);
+                if (beta <= alpha)
+                    break;
             }
-            beta = Math.min(beta, v);
-            if (beta <= alpha)
-                break;
-            if (deadline.timeUntil() < stop_time)
-                break;
-        }
-        return new Pair<Integer, Integer>(bestState, v);
+
+            if (depth == 1 && switcher == 1){
+                switcher = 0;
+            }                
+            }
+
+            return new Pair<Integer, Integer>(bestState, v);  // move, val
+        
     }
+}
   
     public int evaluation3d(GameState gameState, int player) {
-        int board_size = gameState.BOARD_SIZE;
+        int board_size = GameState.BOARD_SIZE;
         int result = 0;
         
         // Get all the layers
@@ -136,7 +151,7 @@ public class Algorithms {
     }
 
     public int[][] getLayer(GameState gameState, int i, int j, int k) {
-        int board_size = gameState.BOARD_SIZE;
+        int board_size = GameState.BOARD_SIZE;
         int[][] result = new int[board_size][board_size];
 
         for (int r = 0; r < board_size; r++)

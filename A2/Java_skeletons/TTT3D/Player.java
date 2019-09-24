@@ -18,8 +18,6 @@ public class Player {
             // Must play "pass" move if there are no other moves possible.
             return new GameState(gameState, new Move());
         }
-        alg.deadline = deadline; // If less than 10% of the time is left, return max found
-        alg.stop_time = 0/* 2*deadline.timeUntil()/3 */; // If less than 10% of the time is left, return max found
         int nextMove = alg.alphabeta(gameState, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, Constants.CELL_X).first;
         return nextStates.elementAt(nextMove);
     }
