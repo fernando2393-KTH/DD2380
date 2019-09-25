@@ -21,11 +21,9 @@ public class Player {
             return new GameState(pState, new Move());
         }
 
-        // int max_depth = 3;
-        // for (int depth = 1; depth < max_depth; depth++) {
-        int depth = 10;
-        Pair<Integer, Integer> action = alg.alphabeta(pState, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, Constants.CELL_WHITE);
-        // }
-        return lNextStates.elementAt(action.first);
+        int max_depth = 5;
+        long time_limit = pDue.timeUntil()/10; // Stop when 10% of the time is left
+        int next_move = alg.iterativeDeepening(max_depth, pState, pDue, time_limit);
+        return lNextStates.elementAt(next_move);
     }
 }
