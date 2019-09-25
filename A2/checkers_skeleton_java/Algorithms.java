@@ -5,6 +5,15 @@ public class Algorithms {
     private final int WHITE_KING = Constants.CELL_WHITE & Constants.CELL_KING;
     private final int RED_KING = Constants.CELL_RED & Constants.CELL_KING;
 
+    /* Constants for evaluation function */
+
+    private final int PIECE_VALUE = 100;
+    private final int KING_VALUE = 50;
+    private final int COL_EDGE = 20;
+    private final int BOTTOM_LINE = 30;
+    private final int SAFE_KING = 10;
+    
+
     public Pair<Integer, Integer> alphabeta(GameState gameState, int depth, int alpha, int beta, int player) {
         if (gameState.isEOG()) {
             if (gameState.isRedWin())
@@ -84,15 +93,15 @@ public class Algorithms {
                 }
 
                 if (gamestate.cellToRow(i) == 7){
-                    whites += 30;
+                    whites += BOTTOM_LINE;
                 }
 
                 else if (gamestate.cellToCol(i) == 0){
-                    whites += 20;
+                    whites += COL_EDGE;
                 }
 
                 else if (gamestate.cellToCol(i) == 7){
-                    whites += 20;
+                    whites += COL_EDGE;
                 }
                 
                 if (gamestate.get(i) != (WHITE_KING)) { // Do it only for normal pieces
@@ -100,18 +109,34 @@ public class Algorithms {
                 if (gamestate.cellToRow(i) != 0 && gamestate.cellToRow(i) != 7 && 
                 gamestate.cellToRow(i) % 2 == 0 && (i % 4) < 3){ // If even not-edge row and one of the first three cells
 
-                    if ((gamestate.get(i-4) != Constants.CELL_RED || gamestate.get(i+5) == Constants.CELL_WHITE)
-                    && (gamestate.get(i-3) != Constants.CELL_RED || gamestate.get(i+4) == Constants.CELL_WHITE)){ // If piece not in danger
-                        whites += 8 - gamestate.cellToRow(i);
+                    if (((gamestate.get(i-4) != Constants.CELL_RED || gamestate.get(i-4) != RED_KING) || gamestate.get(i+5) == Constants.CELL_WHITE)
+                    && ((gamestate.get(i-3) != Constants.CELL_RED || gamestate.get(i-3) != RED_KING) || gamestate.get(i+4) == Constants.CELL_WHITE)
+                    && (gamestate.get(i+4) != RED_KING || gamestate.get(i-3) == Constants.CELL_WHITE)
+                    && (gamestate.get(i+5) != RED_KING || gamestate.get(i-4) == Constants.CELL_WHITE)){ // If piece not in danger
+                        
+                        if (gamestate.get(i) != (WHITE_KING)){ // Do it only for normal pieces
+                            whites += gamestate.cellToRow(i)+1;
+                        }
+                        else {
+                            whites += SAFE_KING; // Unitary cost
+                        }
                     }
                 }
 
                 if (gamestate.cellToRow(i) != 0 && gamestate.cellToRow(i) != 7 && 
                 gamestate.cellToRow(i) % 2 != 0 && (i % 4) > 0){ // If odd not-edge row and one of the last three cells
 
-                    if ((gamestate.get(i-5) != Constants.CELL_RED || gamestate.get(i+4) == Constants.CELL_WHITE)
-                    && (gamestate.get(i-4) != Constants.CELL_RED || gamestate.get(i+3) == Constants.CELL_WHITE)){ // If piece not in danger
-                        whites += 8 - gamestate.cellToRow(i);
+                    if (((gamestate.get(i-5) != Constants.CELL_RED || gamestate.get(i-5) != RED_KING) || gamestate.get(i+4) == Constants.CELL_WHITE)
+                    && ((gamestate.get(i-4) != Constants.CELL_RED || gamestate.get(i-4) != RED_KING) || gamestate.get(i+3) == Constants.CELL_WHITE)
+                    && (gamestate.get(i+3) != RED_KING || gamestate.get(i-4) == Constants.CELL_WHITE)
+                    && (gamestate.get(i+4) != RED_KING || gamestate.get(i-5) == Constants.CELL_WHITE)){ // If piece not in danger
+                                                
+                        if (gamestate.get(i) != (WHITE_KING)){ // Do it only for normal pieces
+                            whites += gamestate.cellToRow(i)+1;
+                        }
+                        else {
+                            whites += SAFE_KING; // Unitary cost
+                        }
                     }
                 }
             }
@@ -128,42 +153,57 @@ public class Algorithms {
                 }
 
                 if (gamestate.cellToRow(i) == 0){
-                    reds += 30;
+                    reds += BOTTOM_LINE;
                 }
 
                 else if (gamestate.cellToCol(i) == 0){
-                    reds += 20;
+                    reds += COL_EDGE;
                 }
 
                 else if (gamestate.cellToCol(i) == 7){
-                    reds += 20;
+                    reds += COL_EDGE;
                 }
 
-                if (gamestate.get(i) != (RED_KING)){ // Do it only for normal pieces
+                
 
                 if (gamestate.cellToRow(i) != 0 && gamestate.cellToRow(i) != 7 && 
                 gamestate.cellToRow(i) % 2 == 0 && (i % 4) < 3){ // If even not-edge row and one of the first three cells
 
-                    if ((gamestate.get(i+4) != Constants.CELL_WHITE || gamestate.get(i-3) == Constants.CELL_RED)
-                    && (gamestate.get(i+5) != Constants.CELL_WHITE || gamestate.get(i-4) == Constants.CELL_RED)){ // If piece not in danger
+                    if (((gamestate.get(i+4) != Constants.CELL_WHITE || gamestate.get(i+4) != WHITE_KING) || gamestate.get(i-3) == Constants.CELL_RED)
+                    && ((gamestate.get(i+5) != Constants.CELL_WHITE || gamestate.get(i+5) != WHITE_KING) || gamestate.get(i-4) == Constants.CELL_RED)
+                    && (gamestate.get(i-4) != WHITE_KING || gamestate.get(i+5) == Constants.CELL_RED)
+                    && (gamestate.get(i-3) != WHITE_KING || gamestate.get(i+4) == Constants.CELL_RED)){ // If piece not in danger
+                        
+                        if (gamestate.get(i) != (RED_KING)){ // Do it only for normal pieces
                         reds += gamestate.cellToRow(i)+1;
+                        }
+                        else {
+                            reds += SAFE_KING; // Unitary cost
+                        }
                     }
                 }
 
                 if (gamestate.cellToRow(i) != 0 && gamestate.cellToRow(i) != 7 && 
                 gamestate.cellToRow(i) % 2 != 0 && (i % 4) > 0){ // If odd not-edge row and one of the last three cells
 
-                    if ((gamestate.get(i+3) != Constants.CELL_WHITE || gamestate.get(i-4) == Constants.CELL_RED)
-                    && (gamestate.get(i+4) != Constants.CELL_WHITE || gamestate.get(i-5) == Constants.CELL_RED)){ // If piece not in danger
-                        reds += gamestate.cellToRow(i)+1;
+                    if (((gamestate.get(i+3) != Constants.CELL_WHITE || gamestate.get(i+3) != WHITE_KING) || gamestate.get(i-4) == Constants.CELL_RED)
+                    && ((gamestate.get(i+4) != Constants.CELL_WHITE || gamestate.get(i+4) != WHITE_KING) || gamestate.get(i-5) == Constants.CELL_RED)
+                    && (gamestate.get(i-5) != WHITE_KING || gamestate.get(i+4) == Constants.CELL_RED)
+                    && (gamestate.get(i-4) != WHITE_KING || gamestate.get(i+3) == Constants.CELL_RED)){ // If piece not in danger
+                        
+                        if (gamestate.get(i) != (RED_KING)){ // Do it only for normal pieces
+                            reds += gamestate.cellToRow(i)+1;
+                            }
+                            else {
+                                reds += SAFE_KING; // Unitary cost
+                            }
                     }
                 }
             }
-            }
         }
 
-        whites += number_of_whites * 100 + white_kings * 50;
-        reds += number_of_reds * 100 + red_kings * 50;
+        whites += number_of_whites * PIECE_VALUE + white_kings * KING_VALUE;
+        reds += number_of_reds * PIECE_VALUE + red_kings * KING_VALUE;
 
         return whites - reds; 
     }
