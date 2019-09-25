@@ -1,6 +1,7 @@
 import java.util.*;
 
 public class Player {
+    Algorithms alg = new Algorithms();
     /**
      * Performs a move
      *
@@ -20,11 +21,11 @@ public class Player {
             return new GameState(pState, new Move());
         }
 
-        /**
-         * Here you should write your algorithms to get the best next move, i.e.
-         * the best next state. This skeleton returns a random move instead.
-         */
-        Random random = new Random();
-        return lNextStates.elementAt(random.nextInt(lNextStates.size()));
+        // int max_depth = 3;
+        // for (int depth = 1; depth < max_depth; depth++) {
+        int depth = 10;
+        Pair<Integer, Integer> action = alg.alphabeta(pState, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, Constants.CELL_WHITE);
+        // }
+        return lNextStates.elementAt(action.first);
     }
 }
