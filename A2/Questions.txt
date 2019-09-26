@@ -1,0 +1,10 @@
+1. Describe the possible states, initial state, transition function.
+
+
+
+Describe the terminal states of both checkers and tic-tac-toe.
+Checkers: A player has 0 checkers left
+TTT: A player aligns 3 pieces, or there is no space left
+
+Why is ν(A,s)=#{white checkers}−#{red checkers} a valid heuristic function for checkers (knowing that A plays white and B plays red)?
+Because A wants to maximize the number of white checkers and minimize the number of red ones.
