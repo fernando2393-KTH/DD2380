@@ -21,10 +21,19 @@ public class Player {
             return new GameState(pState, new Move());
         }
 
+        if (pState.getNextPlayer() == Constants.CELL_RED){
+            alg.max_player = Constants.CELL_RED;
+            alg.min_player = Constants.CELL_WHITE;
+        }
+        else {
+            alg.max_player = Constants.CELL_WHITE;
+            alg.min_player = Constants.CELL_RED;
+        }
+
         // int max_depth = 3;
         // for (int depth = 1; depth < max_depth; depth++) {
-        int depth = 10;
-        Pair<Integer, Integer> action = alg.alphabeta(pState, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, Constants.CELL_WHITE);
+        int depth =11;
+        Pair<Integer, Integer> action = alg.alphabeta(pState, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, alg.max_player);
         // }
         return lNextStates.elementAt(action.first);
     }
