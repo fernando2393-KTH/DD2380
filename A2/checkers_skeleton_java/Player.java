@@ -3,13 +3,11 @@ import java.util.*;
 public class Player {
     Algorithms alg = new Algorithms();
     /**
-     * Performs a move
+     * This function performs a move
      *
-     * @param pState
-     *            the current state of the board
-     * @param pDue
-     *            time before which we must have returned
-     * @return the next state the board is in after our move
+     * @param pState the current state of the board
+     * @param pDue   time before which we must have returned
+     * @return       the next state the board is in after our move
      */
     public GameState play(final GameState pState, final Deadline pDue) {
 
@@ -30,11 +28,10 @@ public class Player {
             alg.min_player = Constants.CELL_RED;
         }
 
-        // int max_depth = 3;
-        // for (int depth = 1; depth < max_depth; depth++) {
         int depth = 11;
+
         Pair<Integer, Integer> action = alg.alphabeta(pState, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, alg.max_player);
-        // }
+        
         return lNextStates.elementAt(action.first);
     }
 }
