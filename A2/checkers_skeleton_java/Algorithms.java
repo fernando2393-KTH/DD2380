@@ -107,7 +107,7 @@ public class Algorithms {
 
         /************ WHITES CHECKING  ************/
 
-        for (int i = 0; i < 32; i++) {
+        for (int i = 0; i < GameState.NUMBER_OF_SQUARES; i++) {
 
             aux = gamestate.get(i);
 
