@@ -32,7 +32,7 @@ public class Player {
 
         // int max_depth = 3;
         // for (int depth = 1; depth < max_depth; depth++) {
-        int depth =11;
+        int depth = 11;
         Pair<Integer, Integer> action = alg.alphabeta(pState, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, alg.max_player);
         // }
         return lNextStates.elementAt(action.first);

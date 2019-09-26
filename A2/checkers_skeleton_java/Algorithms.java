@@ -105,9 +105,9 @@ public class Algorithms {
                 if (gamestate.get(i) == (WHITE_KING)){
                     white_kings++;
                 }
-            //     else {
-            //         number_of_whites++;
-            //     }
+                else {
+                    number_of_whites++;
+                }
 
             //     if (GameState.cellToRow(i) == 7){
             //         whites += BOTTOM_LINE;
@@ -167,9 +167,9 @@ public class Algorithms {
                 if (gamestate.get(i) == (RED_KING)){
                     red_kings++;
                 }
-                // else {
-                //     number_of_reds++;
-                // }
+                else {
+                    number_of_reds++;
+                }
 
                 // if (GameState.cellToRow(i) == 0){
                 //     reds += BOTTOM_LINE;
