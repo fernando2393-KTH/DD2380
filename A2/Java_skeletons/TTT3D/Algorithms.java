@@ -44,11 +44,6 @@ public class Algorithms {
             int bestState = 0;
             int v = Integer.MIN_VALUE;
             for (int i = 0; i < nextStates.size(); i++) {
-                if(depth > 1 || (depth == 1 && switcher == 0)){
-
-                    if (depth == 1){
-                        switcher = 1;
-                    }
 
                     Pair<Integer, Integer> state_i = alphabeta(nextStates.elementAt(i), depth - 1, alpha, beta, Constants.CELL_O);
                     if (state_i.second > v) {
@@ -58,10 +53,6 @@ public class Algorithms {
                     alpha = Math.max(alpha, v);
                     if (beta <= alpha)
                         break;
-                }
-                if (depth == 1 && switcher == 1){
-                    switcher = 0;
-                }
             }
             return new Pair<Integer, Integer>(bestState, v);  // move, val
         }
@@ -72,12 +63,6 @@ public class Algorithms {
             int v = Integer.MAX_VALUE;
             for (int i = nextStates.size()-1; i > -1; i--) {
 
-                if(depth > 1 || (depth == 1 && switcher == 0)){
-
-                    if (depth == 1){
-                        switcher = 1;
-                    }
-
                 Pair<Integer, Integer> state_i = alphabeta(nextStates.elementAt(i), depth - 1, alpha, beta, Constants.CELL_X);
                 if (state_i.second < v) {
                     v = state_i.second;
@@ -86,11 +71,6 @@ public class Algorithms {
                 beta = Math.min(beta, v);
                 if (beta <= alpha)
                     break;
-            }
-
-            if (depth == 1 && switcher == 1){
-                switcher = 0;
-            }                
             }
 
             return new Pair<Integer, Integer>(bestState, v);  // move, val
