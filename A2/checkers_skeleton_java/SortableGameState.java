@@ -1,9 +1,9 @@
 public class SortableGameState implements Comparable {
     public GameState gameState = new GameState();
-    public int score;
+    public double score;
     public int pos;
 
-    public SortableGameState(GameState gs, int sc, int p) {
+    public SortableGameState(GameState gs, double sc, int p) {
         gameState = gs;
         score = sc;
         pos = p;
