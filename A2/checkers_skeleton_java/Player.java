@@ -19,6 +19,7 @@ public class Player {
             return new GameState(pState, new Move());
         }
 
+        // Set player
         if (pState.getNextPlayer() == Constants.CELL_RED){
             alg.max_player = Constants.CELL_RED;
             alg.min_player = Constants.CELL_WHITE;
@@ -28,10 +29,15 @@ public class Player {
             alg.min_player = Constants.CELL_RED;
         }
 
-        int depth = 11;
 
-        Pair<Integer, Integer> action = alg.alphabeta(pState, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, alg.max_player);
-        
-        return lNextStates.elementAt(action.first);
+        // Start iterative deepening
+        int max_depth = 20;
+        // long time_limit = 3*pDue.timeUntil()/4; // Stop when 10% of the time is left
+        long time_limit = (long) 750e6; // Stop when 10% of the time is left
+        int next_move = alg.iterativeDeepening(max_depth, pState, pDue, time_limit);
+        System.err.println("Action: " + next_move);
+        // System.exit(0);
+        return lNextStates.elementAt(next_move);
+
     }
 }
