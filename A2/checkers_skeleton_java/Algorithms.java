@@ -1,7 +1,8 @@
 import java.util.*;
 
 public class Algorithms {
-    public static Hashtable<String, Integer> seen_states = new Hashtable<String, Integer>();
+    public static Hashtable<String, Integer> max_states = new Hashtable<String, Integer>();
+    public static Hashtable<String, Integer> min_states = new Hashtable<String, Integer>();
     // private int hashed_depth = 0;  // Up until which depth has been seen
 
     private final int WHITE_KING = Constants.CELL_WHITE | Constants.CELL_KING;
@@ -23,6 +24,7 @@ public class Algorithms {
         int best_action_score = Integer.MIN_VALUE;
         for (int depth = 1; depth < max_depth; depth++) {
             System.err.println("Depth: " + depth);
+
             Pair<Integer, Integer> action = alphabeta(gamestate, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, player);
             if (action.second > best_action_score) {
                 best_action_score = action.second;
@@ -32,35 +34,37 @@ public class Algorithms {
                 System.err.println("Time limited!");
                 return best_action;
             }
-            System.err.println(seen_states);
+            // System.err.println(max_states);
         }
         return best_action;
     }
 
     public Pair<Integer, Integer> alphabeta(GameState gameState, int depth, int alpha, int beta, int player) {
+        // System.err.print("Depth: " + depth + " ");
+        // System.err.println("Analizing: " + gameState.toMessage());
 
         // Early return conditions
         if (gameState.isEOG()) {
             if (max_player == Constants.CELL_RED){ // Red player
                 if (gameState.isRedWin()) {
-                    seen_states.put(gameState.toMessage(), Integer.MAX_VALUE);
-                    return new Pair<Integer, Integer>(0, Integer.MAX_VALUE);
+                    // max_states.put(gameState.toMessage(), Integer.MAX_VALUE/2);
+                    return new Pair<Integer, Integer>(0, Integer.MAX_VALUE/2);
                 }
                 if (gameState.isWhiteWin()) {
-                    seen_states.put(gameState.toMessage(), Integer.MIN_VALUE);
-                    return new Pair<Integer, Integer>(0, Integer.MIN_VALUE);
+                    // max_states.put(gameState.toMessage(), Integer.MIN_VALUE/2);
+                    return new Pair<Integer, Integer>(0, Integer.MIN_VALUE/2);
                 }
             } else { // White player
                 if (gameState.isRedWin()) {
-                    seen_states.put(gameState.toMessage(), Integer.MIN_VALUE);
-                    return new Pair<Integer, Integer>(0, Integer.MIN_VALUE);
+                    // max_states.put(gameState.toMessage(), Integer.MIN_VALUE/2);
+                    return new Pair<Integer, Integer>(0, Integer.MIN_VALUE/2);
                 }
                 if (gameState.isWhiteWin()) {
-                    seen_states.put(gameState.toMessage(), Integer.MAX_VALUE);
-                    return new Pair<Integer, Integer>(0, Integer.MAX_VALUE);
+                    // max_states.put(gameState.toMessage(), Integer.MAX_VALUE/2);
+                    return new Pair<Integer, Integer>(0, Integer.MAX_VALUE/2);
                 }
             }
-            seen_states.put(gameState.toMessage(), 0);
+            max_states.put(gameState.toMessage(), 0);
             return new Pair<Integer, Integer>(0, 0); // Else is draw
         }
         if (depth == 0)
@@ -78,23 +82,28 @@ public class Algorithms {
             for (int i = 0; i < n_childs; i++) {
                 GameState nextState = nextStates.elementAt(i);
                 String code = nextState.toMessage();
-                
-                // int score = Integer.MIN_VALUE;
-                if (seen_states.containsKey(code)) {
-                    int score = seen_states.get(code);
-                    SortableGameState sgs = new SortableGameState(nextState, score, i);
-                    states.add(sgs);
-                }
-                else {
-                    System.err.println("Missing: " + code);
-                }
+                int score = Integer.MIN_VALUE;
+                if (player == min_player)
+                    score = Integer.MAX_VALUE;
+                if (player == max_player)
+                    if (max_states.containsKey(code))
+                        score = max_states.get(code);
+                if (player == min_player)
+                    if (min_states.containsKey(code))
+                        score = min_states.get(code);
+                SortableGameState sgs = new SortableGameState(nextState, score, i);
+                states.add(sgs);
+                // }
+                // else {
+                //     System.err.println("Missing: " + code);
+                // }
             }
             Collections.sort(states);  // Sort
-            System.err.println("D: " + depth);
-            for (int i = 0; i < n_childs; i++) {
-                System.err.print(states.get(i).score + ", ");
-            }
-            System.err.println(" ");
+            // System.err.println("D: " + depth);
+            // for (int i = 0; i < n_childs; i++) {
+            //     System.err.print(states.get(i).score + ", ");
+            // }
+            // System.err.println(" ");
         }
         else if (depth <= 2) {  // Do not sort (could only use heuristics)
             for (int i = 0; i < n_childs; i++) {
@@ -112,36 +121,40 @@ public class Algorithms {
         if (player == max_player) {  // MAX player
             int bestState = 0;
             int v = Integer.MIN_VALUE;
+            SortableGameState best_child = null;
             for (int i = 0; i < n_childs; i++) {
-                Pair<Integer, Integer> state_i = alphabeta(states.get(i).gameState, depth - 1, alpha, beta, min_player);
-                if (state_i.second > v) {
-                    v = state_i.second;
-                    bestState = states.get(i).pos; // Assign pos previous to sorting
+                SortableGameState state = states.get(i);
+                Pair<Integer, Integer> state_info = alphabeta(state.gameState, depth - 1, alpha, beta, min_player);
+                if (state_info.second > v) {
+                    v = state_info.second;
+                    bestState = state.pos; // Assign pos previous to sorting
+                    best_child = state;
                 }
                 alpha = Math.max(alpha, v);
                 if (beta <= alpha)
                     break;
             }
-            // System.err.println(gameState.toMessage());
-            // System.err.println(v);
-            seen_states.put(gameState.toMessage(), v);
-            // System.err.println(seen_states.containsKey(gameState.toMessage()));
-            // System.err.println(seen_states.get(gameState.toMessage()));
+            max_states.put(gameState.toMessage(), v);
+            // max_states.put(best_child.gameState.toMessage(), v);
             return new Pair<Integer, Integer>(bestState, v); // move, val
         } else {  // MIN player
             int bestState = 0;
             int v = Integer.MAX_VALUE;
+            SortableGameState best_child = null;
             for (int i = n_childs - 1; i > - 1; i--) {
-                Pair<Integer, Integer> state_i = alphabeta(states.get(i).gameState, depth - 1, alpha, beta, max_player);
+                SortableGameState state = states.get(i);
+                Pair<Integer, Integer> state_i = alphabeta(state.gameState, depth - 1, alpha, beta, max_player);
                 if (state_i.second < v) {
                     v = state_i.second;
-                    bestState = states.get(i).pos;
+                    bestState = state.pos;
+                    best_child = state;
                 }
                 beta = Math.min(beta, v);
                 if (beta <= alpha)
                     break;
             }
-            seen_states.put(gameState.toMessage(), v);
+            min_states.put(gameState.toMessage(), v);
+            // min_states.put(best_child.gameState.toMessage(), v);
             return new Pair<Integer, Integer>(bestState, v); // move, val
         }
     }
@@ -166,7 +179,6 @@ public class Algorithms {
             else if (aux == RED_KING)
                 red_kings++;
         }
-
         int whites = number_of_whites * PIECE_VALUE + white_kings * KING_VALUE;
         int reds = number_of_reds * PIECE_VALUE + red_kings * KING_VALUE;
 
