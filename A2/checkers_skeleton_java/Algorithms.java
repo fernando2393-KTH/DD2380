@@ -9,7 +9,7 @@ public class Algorithms {
 
     /* Constants for evaluation function */
     private final int PIECE_VALUE = 1;
-    private final int KING_VALUE = 1;
+    private final int KING_VALUE = 3;
 
     /* Store player */
     public int max_player;
@@ -209,8 +209,8 @@ public class Algorithms {
         double reds = number_of_reds * PIECE_VALUE + red_kings * KING_VALUE;
 
         if (max_player == Constants.CELL_RED){
-            return (reds - whites)/(reds + whites);
-        }
-        return (whites - reds)/(reds + whites);
+            return (reds - whites);///(reds + whites);
+        }            
+        return (whites - reds);///(reds + whites);
     }
 }
