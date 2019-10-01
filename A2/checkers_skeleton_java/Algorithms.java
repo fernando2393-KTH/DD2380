@@ -16,39 +16,21 @@ public class Algorithms {
     public int min_player;
     
     public Integer iterativeDeepening(int max_depth, GameState gamestate, Deadline deadline, long time_limit) {
-        int best_action = 0;
-        double best_action_score = -Double.MAX_VALUE;
-        Pair<Integer, Double> action =null;
-
+        Pair<Integer, Double> action = null;
         for (int depth = 1; depth < max_depth; depth++) {
-            // System.err.println("Depth: " + depth);
-
             action = alphabeta(gamestate, depth, -Double.MAX_VALUE, Double.MAX_VALUE, max_player);
-            // if (action.second > best_action_score) {
-            //     best_action_score = action.second;
-            //     best_action = action.first;
-            // }
             if (deadline.timeUntil() < time_limit) {
-                System.err.println("Time limited!");
-                // return best_action;
                 return action.first;
             }
-            // System.err.println(max_states);
-            // System.err.println(min_states);
         }
-        best_action_score = -Double.MAX_VALUE;
-        System.err.println("Action: " + best_action);
-        // Pair<Integer, Double> action = alphabeta(gamestate, max_depth, -Double.MAX_VALUE, Double.MAX_VALUE, max_player);
         return action.first;
     }
 
     public Pair<Integer, Double> alphabeta(GameState gameState, int depth, double alpha, double beta, int player) {
-        // System.err.print("Depth: " + depth + " ");
-        // System.err.println("Analizing: " + gameState.toMessage());
 
         // Early return conditions
         if (gameState.isEOG()) {
-            if (max_player == Constants.CELL_RED){ // Red player
+            if (max_player == Constants.CELL_RED){ // MAX is Red player
                 if (gameState.isRedWin()) {
                     max_states.put(gameState.toMessage(), Double.MAX_VALUE/2);
                     return new Pair<Integer, Double>(0, Double.MAX_VALUE/2);
@@ -57,7 +39,7 @@ public class Algorithms {
                     max_states.put(gameState.toMessage(), -Double.MAX_VALUE/2);
                     return new Pair<Integer, Double>(0, -Double.MAX_VALUE/2);
                 }
-            } else { // MIN player
+            } else { // MIN is Red player
                 if (gameState.isRedWin()) {
                     min_states.put(gameState.toMessage(), -Double.MAX_VALUE/2);
                     return new Pair<Integer, Double>(0, -Double.MAX_VALUE/2);
@@ -87,6 +69,8 @@ public class Algorithms {
             GameState nextState = null;
             String code = "";
             double score;
+            double max_score = -Double.MAX_VALUE;
+            int max_pos = 0;
             for (int i = 0; i < n_childs; i++) {
                 nextState = nextStates.elementAt(i);
                 code = nextState.toMessage();
@@ -94,21 +78,21 @@ public class Algorithms {
                 if (player == max_player) // Means your children are min
                     if (max_states.containsKey(code)) {
                         score = max_states.get(code);
-                        // System.err.println("score:" + score);
                     }
                 if (player == min_player)  // Means your children are max
                     score = Double.MAX_VALUE/3;
                     if (min_states.containsKey(code))
                         score = min_states.get(code);
-                // SortableGameState sgs = new SortableGameState(nextState, score, i);
+
+                if (score > max_score) {  // Get best score (to put at beginning)
+                    max_score = score;
+                    max_pos = i;
+                }
                 states.add(new SortableGameState(nextState, score, i));
             }
-            Collections.sort(states);  // Sort
-            // System.err.println("D: " + depth);
-            // for (int i = 0; i < n_childs; i++) {
-            //     System.err.print(states.get(i).score + ", ");
-            // }
-            // System.err.println(" ");
+            // Swap it for element at 0
+            Collections.swap(states, 0, max_pos);
+            // Collections.sort(states);
         }
         else {  // Do not sort (could only use heuristics)
             GameState nextState;
@@ -118,12 +102,7 @@ public class Algorithms {
             }
         }
 
-        // System.err.println("Depth: " + depth);
-        // for (int i = 0; i < n_childs; i++) {
-        //     System.err.print(states.get(i).score + ", ");
-        // }
-        // System.err.println(" ");
-
+        // Develop Tree
         if (player == max_player) {  // MAX player
             int best_child_pos = 0;
             double v = -Double.MAX_VALUE;
@@ -181,7 +160,6 @@ public class Algorithms {
         double red_kings = 0;
 
         double aux = 0;
-
         for (int i = 0; i < GameState.NUMBER_OF_SQUARES; i++) {
             aux = gamestate.get(i);
             if (aux == Constants.CELL_EMPTY){

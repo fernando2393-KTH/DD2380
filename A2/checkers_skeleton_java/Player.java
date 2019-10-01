@@ -32,7 +32,7 @@ public class Player {
         }
 
         // Start iterative deepening
-        int max_depth = 20;
+        int max_depth = 16;
         // long time_limit = 3*pDue.timeUntil()/4; // Stop when 10% of the time is left
         long time_limit = (long) 600e6; // Stop when 10% of the time is left
         int next_move = alg.iterativeDeepening(max_depth, pState, pDue, time_limit);
