@@ -1,6 +1,6 @@
-# KTH AI
+# DD2380 - Artificial Intelligence
 
-KTH Artificial Intelligence course practices:
+Projects of the KTH DD2421 - Artificial Intelligence course.
 
 The two projects done consists of:
   * Development of probability algorithms (Forward, Backward, Viterbi, Baum-Welch) and their implementation into the "Duck Hunt" game to automatize it achieving a great performance.
